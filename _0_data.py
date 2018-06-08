@@ -6,7 +6,7 @@ class GUIData:
         self.v = self
         self.l = self
 
-        self.v.version = StringVar(None, "rev0.170726")
+        self.v.version = StringVar(None, "rev0.180608")
         self.v.logfilename = StringVar()
         self.v.log_bool = BooleanVar(None, False)
         self.v.i2c_bool = BooleanVar(None, False)
