@@ -7,6 +7,7 @@ from ctypes import *
 class TestTab:
     def __init__(self, parent):
         self.p = parent
+        self.gui = self.p.gui
         self.reg = self.p.reg
         self.tst = self.p.tst
         self.spl = self.p.spl
@@ -21,7 +22,7 @@ class TestTab:
         summ_frm = ttk.Frame(test_note)
         BIST_frm = ttk.Frame(test_note)
         self.gpio_frm = ttk.Frame(test_note)
-        powr_frm = ttk.Frame(test_note, padding=50)
+        powr_frm = ttk.Frame(test_note, padding=self.gui.v.pad.get() * 5)
         test_note.add(summ_frm, text=" Reg. File Summary ")
         test_note.add(BIST_frm, text=" BIST ")
         test_note.add(self.gpio_frm, text=" GPIO ")
@@ -225,6 +226,7 @@ class TestTab:
 class GPIOTab:
     def __init__(self, parent):
         self.p = parent
+        self.gui = self.p.gui
         self.reg = self.p.reg
         self.tst = self.p.tst
         self.spl = self.p.spl
@@ -247,7 +249,7 @@ class GPIOTab:
 
 # --------------------Main Data-----------------------------------------------------------------------------------------
 
-        self.main_l = ttk.Frame(tabs[0], padding=50)
+        self.main_l = ttk.Frame(tabs[0], padding=self.gui.v.pad.get() * 5)
         self.main_l.place(relx=0, rely=0, relwidth=0.7, relheight=0.6)
         main_r = ttk.Frame(tabs[0])
         main_r.place(relx=0.7, rely=0, relwidth=0.3, relheight=0.6)
@@ -324,23 +326,23 @@ class GPIOTab:
 
 # ------------------Pulse Extend----------------------------------------------------------------------------------------
 
-        ext_frm = ttk.Frame(tabs[1], padding=30)
+        ext_frm = ttk.Frame(tabs[1], padding=self.gui.v.pad.get() * 3)
         btn_frm = ttk.Frame(tabs[1])
         ext_frm.place(relx=0, rely=0, relwidth=0.7, relheight=1)
         btn_frm.place(relx=0.7, rely=0, relwidth=0.3, relheight=1)
 
-        ttk.Label(ext_frm, text="Pulse Width Adjustment").grid(row=0, column=0, columnspan=5, padx=(50, 0), pady=(0, 10))
+        ttk.Label(ext_frm, text="Pulse Width Adjustment").grid(row=0, column=0, columnspan=5, padx=(50, 0), pady=(0, self.gui.v.pad.get()))
         for i in range(8):
-            ttk.Label(ext_frm, text="GPIO " + str(i)).grid(row=1 + 2 * i, column=0, padx=(70, 0), pady=(20, 0), sticky=NW)
-            ttk.Label(ext_frm, text="Extend Type:").grid(row=2 + 2 * i, column=0, padx=(100, 5), pady=10, sticky=NW)
-            ttk.Label(ext_frm, text="Extend Amount:").grid(row=2 + 2 * i, column=2, padx=(20, 5), pady=10, sticky=NW)
-            ttk.Label(ext_frm, text="2 ^").grid(row=2 + 2 * i, column=3, padx=(5, 0), pady=10, sticky=NW)
+            ttk.Label(ext_frm, text="GPIO " + str(i)).grid(row=1 + 2 * i, column=0, padx=(70, 0), pady=(self.gui.v.pad.get() * 2, 0), sticky=NW)
+            ttk.Label(ext_frm, text="Extend Type:").grid(row=2 + 2 * i, column=0, padx=(100, 5), pady=self.gui.v.pad.get(), sticky=NW)
+            ttk.Label(ext_frm, text="Extend Amount:").grid(row=2 + 2 * i, column=2, padx=(20, 5), pady=self.gui.v.pad.get(), sticky=NW)
+            ttk.Label(ext_frm, text="2 ^").grid(row=2 + 2 * i, column=3, padx=(5, 0), pady=self.gui.v.pad.get(), sticky=NW)
             self.widgets["t" + str(i)] = ttk.Combobox(ext_frm, value=self.tst.l.ext_types, textvariable=self.tst.v.type_sel[i], width=20, state="readonly")
             self.widgets["a" + str(i)] = ttk.Combobox(ext_frm, value=self.tst.l.ext_amnts, textvariable=self.tst.v.amnt_sel[i], width=10, state="readonly")
-            self.widgets["t" + str(i)].grid(row=2 + 2 * i, column=1, padx=5, pady=10, sticky=NW)
-            self.widgets["a" + str(i)].grid(row=2 + 2 * i, column=4, padx=5, pady=10, sticky=NW)
+            self.widgets["t" + str(i)].grid(row=2 + 2 * i, column=1, padx=5, pady=self.gui.v.pad.get(), sticky=NW)
+            self.widgets["a" + str(i)].grid(row=2 + 2 * i, column=4, padx=5, pady=self.gui.v.pad.get(), sticky=NW)
 
-        ttk.Button(btn_frm, text="Load Data", width=20, command=self.gpio_load).pack(side=TOP, padx=(0, 130), pady=(65, 0), ipady=3, anchor=E)
+        ttk.Button(btn_frm, text="Load Data", width=20, command=self.gpio_load).pack(side=TOP, padx=(0, 130), pady=(15 + self.gui.v.pad.get() * 5, 0), ipady=3, anchor=E)
         ttk.Button(btn_frm, text="Set Data", width=20, command=self.gpio_set).pack(side=TOP, padx=(0, 130), pady=(15, 0), ipady=3, anchor=E)
         ttk.Button(btn_frm, text="Set I\u00b2C", width=20, command=self.gpio_i2c).pack(side=TOP, padx=(0, 130), pady=(15, 0), ipady=3, anchor=E)
         ttk.Button(btn_frm, text="Set Default", width=20, command=self.gpio_set_default).pack(side=TOP, padx=(0, 130), pady=(15, 0), ipady=3, anchor=E)
@@ -979,11 +981,15 @@ class GPIOTab:
             return
 
         for nested_list in gpio_hexa:
-            for (new, pg, num) in nested_list:
-                if new != "":
-                    pg_idx = self.spl.pages_unique.index(pg)
-                    if new != self.adr.hexa_per_pg_mod[pg_idx][num]:
-                        self.reg_tab.modify1(str(pg) + " " + self.adr.num_range[pg_idx][num // 16], str(pg), num, new, mod_tag="gpio")
+            for (news, pgs, nums, bits) in nested_list:
+                if news != "":
+                    new = news.split()
+                    pg = pgs.split()
+                    num = nums.split()
+                    for i in range(len(new)):
+                        pg_idx = self.spl.pages_unique.index(int(pg[i]))
+                        if new[i] != self.adr.hexa_per_pg_mod[pg_idx][int(num[i])]:
+                            self.reg_tab.modify1(pg[i] + " " + self.adr.num_range[pg_idx][int(num[i]) // 16], pg[i], int(num[i]), new[i], mod_tag="gpio")
 
         messagebox.showinfo("Set Data to Register Files", "Complete")
 
@@ -1024,10 +1030,24 @@ class GPIOTab:
             new_hexa = new_hexa[first_num:int(last_num) + 1]
             write_list.append((int(f"{first_pg:02X}" + f"{first_num:02X}", 16), " ".join(new_hexa)))
 
-        for (new, pg, num) in gpio_hexa[1]:
-            if new != "":
-                write_list.append((int(f"{pg:02X}" + f"{num:02X}", 16), new))
-        print(write_list)
+        for (i, (news, pgs, nums, bits)) in list(enumerate(gpio_hexa[1])):
+            new = news.split()
+            pg = pgs.split()
+            num = nums.split()
+            bit = bits.split()
+            for j in range(len(new)):
+                if new[j] != "":
+                    bin = f"{int(new[j], 16):08b}"
+                    if ":" in bit[j]:
+                        bit_l, bit_r = [int(x) for x in bit[j].split(":")]
+                        bin_part = bin[8 - bit_l - 1:8 - bit_r]
+                    else:
+                        bit_l, bit_r = None, int(bit[j])
+                        bin_part = bin[8 - bit_r - 1]
+                    new_bin = self.p.p.replace_text(bit_r, bit_l, bin_part, self.i2c_tab.read_one_addr(pg[j] + "-" + num[j]))
+                    new_hex = f"{int(new_bin, 2):02X}"
+                    write_list.append((int(f"{int(pg[j]):02X}" + f"{int(num[j]):02X}", 16), new_hex))
+
         self.i2c_tab.write_byte_list(write_list)
 
         messagebox.showinfo("Set I\u00b2C", "Complete")
@@ -1041,32 +1061,36 @@ class GPIOTab:
             return
 
         for nested_list in gpio_hexa:
-            for (new, pg, num) in nested_list:
-                if new != "":
-                    pg_idx = self.spl.pages_unique.index(pg)
-                    if new != self.adr.hexa_per_pg_mod[pg_idx][num]:
-                        self.reg_tab.modify1(str(pg) + " " + self.adr.num_range[pg_idx][num // 16], str(pg), num, new, mod_tag="")
-                        spl_idx = []
-                        mer_idx = []
-                        adr_idx = self.adr.l.pg_and_num.index(str(pg) + "-" + str(num))
-                        for (i, pg_num) in list(enumerate([x.split("(")[0] for x in self.spl.addr_total])):
-                            if pg_num == str(pg) + "-" + str(num):
-                                spl_idx.append(i)
-                        for j in spl_idx:
-                            for (k, name) in self.mer.l.names:
-                                if name == self.spl.l.names_wo_width[j]:
-                                    mer_idx.append(k)
-                        for s_idx in spl_idx:
-                            self.spl.bina[s_idx] = self.spl.bina_mod[s_idx]
-                            self.spl.deci[s_idx] = self.spl.deci_mod[s_idx]
-                            self.spl.hexa[s_idx] = self.spl.hexa_mod[s_idx]
-                        for m_idx in mer_idx:
-                            self.mer.bina[m_idx] = self.mer.bina_mod[m_idx]
-                            self.mer.deci[m_idx] = self.mer.deci_mod[m_idx]
-                            self.mer.hexa[m_idx] = self.mer.hexa_mod[m_idx]
-                        self.adr.bina[adr_idx] = self.adr.bina_mod[adr_idx]
-                        self.adr.hexa[adr_idx] = self.adr.hexa_mod[adr_idx]
-                        self.adr.hexa_per_pg[pg_idx][num] = self.adr.hexa_per_pg_mod[pg_idx][num]
+            for (news, pgs, nums, bits) in nested_list:
+                new = news.split()
+                pg = pgs.split()
+                num = nums.split()
+                for i in range(len(new)):
+                    if new[i] != "":
+                        pg_idx = self.spl.pages_unique.index(int(pg[i]))
+                        if new[i] != self.adr.hexa_per_pg_mod[pg_idx][int(num[i])]:
+                            self.reg_tab.modify1(pg[i] + " " + self.adr.num_range[pg_idx][int(num[i]) // 16], pg[i], int(num[i]), new[i], mod_tag="")
+                            spl_idx = []
+                            mer_idx = []
+                            adr_idx = self.adr.l.pg_and_num.index(pg[i] + "-" + str(num))
+                            for (i, pg_num) in list(enumerate([x.split("(")[0] for x in self.spl.addr_total])):
+                                if pg_num == pg[i] + "-" + num[i]:
+                                    spl_idx.append(i)
+                            for j in spl_idx:
+                                for (k, name) in self.mer.l.names:
+                                    if name == self.spl.l.names_wo_width[j]:
+                                        mer_idx.append(k)
+                            for s_idx in spl_idx:
+                                self.spl.bina[s_idx] = self.spl.bina_mod[s_idx]
+                                self.spl.deci[s_idx] = self.spl.deci_mod[s_idx]
+                                self.spl.hexa[s_idx] = self.spl.hexa_mod[s_idx]
+                            for m_idx in mer_idx:
+                                self.mer.bina[m_idx] = self.mer.bina_mod[m_idx]
+                                self.mer.deci[m_idx] = self.mer.deci_mod[m_idx]
+                                self.mer.hexa[m_idx] = self.mer.hexa_mod[m_idx]
+                            self.adr.bina[adr_idx] = self.adr.bina_mod[adr_idx]
+                            self.adr.hexa[adr_idx] = self.adr.hexa_mod[adr_idx]
+                            self.adr.hexa_per_pg[pg_idx][int(num[i])] = self.adr.hexa_per_pg_mod[pg_idx][int(num[i])]
 
         messagebox.showinfo("Set GPIO Defaults", "Complete")
 
@@ -1148,10 +1172,10 @@ class GPIOTab:
         types = [x.get() for x in self.tst.v.type_sel]
         amnts = [x.get() for x in self.tst.v.amnt_sel]
         hexa = [
-                [["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""],                # grp & bit selection                "consecutive address
-                 ["", "", ""], ["", "", ""],                                                                                                    # clk selection                       from
-                 ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""]],               # extend type & amount selection      141-70 to 141-87"
-                [["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""]]  # group reg name                     "address scattered throughout reg"
+                [["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""],                    # grp & bit selection                "consecutive address
+                 ["", "", "", ""], ["", "", "", ""],                                                                                                                                # clk selection                       from
+                 ["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""]],                   # extend type & amount selection      141-70 to 141-87"
+                [["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""]]  # group reg name                     "address scattered throughout reg"
                 ]
 
         if (self.tst.l.gpio_grps[7] in grps) & (self.tst.l.gpio_grps[8] in grps):
@@ -1265,41 +1289,44 @@ class GPIOTab:
         for k in range(8):
             if self.tst.v.gpio_sel[k].get() != "OFF":
                 choice = int(self.tst.v.gpio_sel[k].get())
-                idx = self.spl.l.names_wo_width.index(self.tst.l.gpio_grp_reg_names_wo_width[k])
-                pg, num = [int(x) for x in self.spl.l.addr_total[idx].split("(")[0].split("-")]
-                pg_idx = self.spl.pages_unique.index(pg)
-                bit_l, bit_r = [int(x) for x in self.tst.l.gpio_grp_reg_names_w_width[k].strip("]").split("[")[1].split(":")]
-                if hexa[1][k][0] == "":
+                indices = [i for i, x in enumerate(self.spl.l.names_wo_width) if x == self.tst.l.gpio_grp_reg_names_wo_width[k]]
+                hex_list = []
+                pg_list = []
+                num_list = []
+                bit_list = []
+                for idx in indices:
+                    pg, num = [int(x) for x in self.spl.l.addr_total[idx].split("(")[0].split("-")]
+                    pg_idx = self.spl.pages_unique.index(pg)
+                    bit_l, bit_r = [int(x) for x in self.tst.l.gpio_grp_widths[k].split(":")]
                     bin = self.p.p.replace_text(bit_r, bit_l, f"{choice:b}".zfill(bit_l - bit_r + 1), text=f"{int(self.adr.l.hexa_per_pg_mod[pg_idx][num], 16):08b}")
-                else:
-                    bin = self.p.p.replace_text(bit_r, bit_l, f"{choice:03b}", text=f"{int(hexa[1][k][0], 16):08b}")
-                hexa[1][k][0] = f"{int(str(bin), 2):02X}"
-                for n in (1, 2):
-                    hexa[1][k][n] = (pg, num)[n - 1]
+                    hex_list.append(f"{int(str(bin), 2):02X}")
+                    pg_list.append(str(pg))
+                    num_list.append(str(num))
+                    bit_list.append(self.spl.l.addr_bit[idx])
+                hexa[1][k][0] = " ".join(hex_list)
+                hexa[1][k][1] = " ".join(pg_list)
+                hexa[1][k][2] = " ".join(num_list)
+                hexa[1][k][3] = " ".join(bit_list)
 
         if self.tst.l.gpio_grps[7] in grps:
             idx = self.spl.l.names_wo_width.index(self.tst.l.gpio_grp_reg_names_wo_width[9])
             pg, num = [int(x) for x in self.spl.l.addr_total[idx].split("(")[0].split("-")]
             pg_idx = self.spl.pages_unique.index(pg)
-            bit_l, bit_r = None,int(self.spl.addr_bit[idx])
-            if hexa[1][8][0] == "":
-                bin = self.p.p.replace_text(bit_r, bit_l, "1", text=f"{int(self.adr.l.hexa_per_pg_mod[pg_idx][num], 16):08b}")
-            else:
-                bin = self.p.p.replace_text(bit_r, bit_l, "1", text=f"{int(hexa[1][8][0], 16):08b}")
+            bit_l, bit_r = None, int(self.spl.addr_bit[idx])
+            bin = self.p.p.replace_text(bit_r, bit_l, "1", text=f"{int(self.adr.l.hexa_per_pg_mod[pg_idx][num], 16):08b}")
             hexa[1][8][0] = f"{int(str(bin), 2):02X}"
             for n in (1, 2):
                 hexa[1][8][n] = (pg, num)[n - 1]
+            hexa[1][8][3] = self.spl.l.addr_bit[idx]
         elif self.tst.l.gpio_grps[8] in grps:
             idx = self.spl.l.names_wo_width.index(self.tst.l.gpio_grp_reg_names_wo_width[9])
             pg, num = [int(x) for x in self.spl.l.addr_total[idx].split("(")[0].split("-")]
             pg_idx = self.spl.pages_unique.index(pg)
             bit_l, bit_r = None, int(self.spl.addr_bit[idx])
-            if hexa[1][8][0] == "":
-                bin = self.p.p.replace_text(bit_r, bit_l, "1", text=f"{int(self.adr.l.hexa_per_pg_mod[pg_idx][num], 16):08b}")
-            else:
-                bin = self.p.p.replace_text(bit_r, bit_l, "1", text=f"{int(hexa[1][8][0], 16):08b}")
+            bin = self.p.p.replace_text(bit_r, bit_l, "1", text=f"{int(self.adr.l.hexa_per_pg_mod[pg_idx][num], 16):08b}")
             hexa[1][8][0] = f"{int(str(bin), 2):02X}"
             for n in (1, 2):
                 hexa[1][8][n] = (pg, num)[n - 1]
+            hexa[1][8][3] = self.spl.l.addr_bit[idx]
 
         return hexa

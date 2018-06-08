@@ -8,19 +8,20 @@ import time
 class FlashTab:
     def __init__(self, parent):
         self.p = parent
+        self.gui = self.p.gui
         self.i2c = self.p.i2c
         self.fls = self.p.fls
         self.i2c_tab = self.p.i2c_tab
 
-        top_frm = ttk.Frame(self.p.flash_frm, padding=10)
+        top_frm = ttk.Frame(self.p.flash_frm, padding=self.gui.v.pad.get())
         flash_note = ttk.Notebook(self.p.flash_frm)
         top_frm.pack(fill=X)
         flash_note.pack(fill=BOTH, expand=YES)
 
         ttk.Label(top_frm, text="I\u00b2C Slave Address (hex) ").grid(row=0, column=0, sticky=NE)
-        ttk.Entry(top_frm, textvariable=self.i2c.v.i2c_slave_addr, width=2).grid(row=0, column=1, sticky=NW)
+        ttk.Entry(top_frm, textvariable=self.i2c.v.slave_addr, width=2).grid(row=0, column=1, sticky=NW)
 
-        sp_frm = ttk.Frame(flash_note, padding=50)
+        sp_frm = ttk.Frame(flash_note, padding=self.gui.v.pad.get() * 5)
         flash_note.add(sp_frm, text=" SP Flash ")
 
         sp0 = ttk.Frame(sp_frm)
@@ -61,9 +62,9 @@ class FlashTab:
     def write_1_byte(self, addr, byte):
         byte_list = create_string_buffer(1)
         byte_list[0:1] = bytearray().fromhex(byte)
-        sub_errno, result = self.i2c_tab.sub20_i2c_write(int(self.i2c.v.i2c_slave_addr.get(), 16), int(addr, 16), byte_list)
+        sub_errno, result = self.i2c_tab.sub20_i2c_write(int(self.i2c.v.slave_addr.get(), 16), int(addr, 16), byte_list)
         if sub_errno != 0:
-            messagebox.showinfo("EEPROM Write Result", "Write Failed\n" + result)
+            messagebox.showinfo("I\u00b2C Write Result", "Write Failed\n" + result)
     
     def write_addr(self, addr_str):
         rm_sp = re.compile(r"\s+")
@@ -71,19 +72,19 @@ class FlashTab:
         addr_list = addr_flip.findall(rm_sp.sub("", addr_str))
         byte_list = create_string_buffer(3)
         byte_list[0:3] = bytearray().fromhex(" ".join(reversed(addr_list)))
-        sub_errno, result = self.i2c_tab.sub20_i2c_write(int(self.i2c.v.i2c_slave_addr.get(), 16), int("9537", 16), byte_list)
+        sub_errno, result = self.i2c_tab.sub20_i2c_write(int(self.i2c.v.slave_addr.get(), 16), int("9537", 16), byte_list)
         if sub_errno != 0:
-            messagebox.showinfo("EEPROM Write Result", "Write Failed\n" + result)
+            messagebox.showinfo("I\u00b2C Write Result", "Write Failed\n" + result)
 
     def write_data(self, str_24b):
         byte_list = create_string_buffer(24)
         byte_list[0:24] = bytearray().fromhex(str_24b)
-        sub_errno, result = self.i2c_tab.sub20_i2c_write(int(self.i2c.v.i2c_slave_addr.get(), 16), int("953A", 16), byte_list)
+        sub_errno, result = self.i2c_tab.sub20_i2c_write(int(self.i2c.v.slave_addr.get(), 16), int("953A", 16), byte_list)
         if sub_errno != 0:
-            messagebox.showinfo("EEPROM Write Result", "Write Failed\n" + result)
+            messagebox.showinfo("I\u00b2C Write Result", "Write Failed\n" + result)
 
     def read_data(self, n):
-        read_list, result = self.i2c_tab.sub20_i2c_read(int(self.i2c.v.i2c_slave_addr.get(), 16), int("958F", 16), n)
+        read_list, result = self.i2c_tab.sub20_i2c_read(int(self.i2c.v.slave_addr.get(), 16), int("958F", 16), n)
         time.sleep(0.1)
         try:
             len(read_list)

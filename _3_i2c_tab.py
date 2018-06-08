@@ -36,14 +36,14 @@ class I2CTab:
         frm1.place(relx=0.57, rely=0.1, relwidth=0.43, relheight=0.9)
 
         ttk.Label(frm0, text="I\u00b2C Slave Address (hex) ").grid(row=0, column=0, columnspan=2, pady=(0, 5), sticky=NE)
-        ttk.Entry(frm0, textvariable=self.i2c.v.i2c_slave_addr, width=2).grid(row=0, column=2, pady=(0, 5), sticky=NW)
+        ttk.Entry(frm0, textvariable=self.i2c.v.slave_addr, width=2).grid(row=0, column=2, pady=(0, 5), sticky=NW)
         ttk.Label(frm0, text="I\u00b2C Access Address (hex, 2-byte) ").grid(row=1, column=0, columnspan=2, pady=(0, 30), sticky=NE)
-        ttk.Entry(frm0, textvariable=self.i2c.v.i2c_access_addr, width=5).grid(row=1, column=2, pady=(0, 5), sticky=NW)
+        ttk.Entry(frm0, textvariable=self.i2c.v.access_addr, width=5).grid(row=1, column=2, pady=(0, 5), sticky=NW)
         ttk.Label(frm0, text="I\u00b2C Access Data").grid(row=2, column=0, columnspan=3, padx=(0, 50), pady=(0, 5), sticky=N)
         ttk.Button(frm0, text="Write", command=self.write).grid(row=3, column=0, padx=(0, 5), pady=(0, 10), sticky=NE)
-        ttk.Entry(frm0, textvariable=self.i2c.v.i2c_write, width=30).grid(row=3, column=1, columnspan=2, pady=(0, 10), sticky=W)
+        ttk.Entry(frm0, textvariable=self.i2c.v.write, width=30).grid(row=3, column=1, columnspan=2, pady=(0, 10), sticky=W)
         ttk.Label(frm0, text="# of Reading Bytes (dec) ").grid(row=4, column=0, pady=(0, 5), sticky=NE)
-        ttk.Entry(frm0, textvariable=self.i2c.v.i2c_read_num, width=2).grid(row=4, column=1, pady=(0, 5), sticky=NW)
+        ttk.Entry(frm0, textvariable=self.i2c.v.read_num, width=2).grid(row=4, column=1, pady=(0, 5), sticky=NW)
         ttk.Button(frm0, text="Read", command=self.read).grid(row=5, column=0, padx=(0, 5), sticky=NE)
         self.tkst_read = tkst(frm0, width=30, height=12)
         self.tkst_read.grid(row=5, column=1, columnspan=2, sticky=NW)
@@ -73,13 +73,13 @@ class I2CTab:
         dr = create_string_buffer(data_num)
         sub_errno = self.helper.sub_i2c_read(self.hdev, slv_addr, mem_addr, 2, dr, data_num)
         read_str = " ".join([f"{ord(x):02X}" for x in dr]).strip()
-        result_txt = "R: Slave = " + f"{slv_addr:02X}" + ", Memory address = " + f"{mem_addr:04X}" + ", Data = " + read_str
+        result_txt = "Slave = " + f"{slv_addr:02X}" + ", Memory address = " + f"{mem_addr:04X}" + ", Data = " + read_str
         if self.gui.v.i2c_bool.get():
             print(result_txt)
         if self.gui.v.log_bool.get():
             if sub_errno != 0:
                 logfile = open(self.gui.v.logfilename.get(), "a")
-                logfile.write("F: " + result_txt + "\n")
+                logfile.write("RF: " + result_txt + "\n")
                 logfile.close()
             else:
                 logfile = open(self.gui.v.logfilename.get(), "a")
@@ -100,13 +100,13 @@ class I2CTab:
         data_num = len(byte_list)
         sub_errno = self.helper.sub_i2c_write(self.hdev, slv_addr, mem_addr, 2, byte_list, data_num)
         write_str = " ".join([f"{ord(x):02X}" for x in byte_list]).strip()
-        result_txt = "W: Slave = " + f"{slv_addr:02X}" + ", Memory address = " + f"{mem_addr:04X}" + ", Data = " + write_str
+        result_txt = "Slave = " + f"{slv_addr:02X}" + ", Memory address = " + f"{mem_addr:04X}" + ", Data = " + write_str
         if self.gui.v.i2c_bool.get():
             print(result_txt)
         if self.gui.v.log_bool.get():
             if sub_errno != 0:
                 logfile = open(self.gui.v.logfilename.get(), "a")
-                logfile.write("F: " + result_txt + "\n")
+                logfile.write("WF: " + result_txt + "\n")
                 logfile.close()
             else:
                 logfile = open(self.gui.v.logfilename.get(), "a")
@@ -123,13 +123,13 @@ class I2CTab:
         dr = create_string_buffer(data_num)
         sub_errno = self.helper.sub_i2c_read(self.hdev, slv_addr, 0, 0, dr, data_num)
         read_str = " ".join([f"{ord(x):02X}" for x in dr]).strip()
-        result_txt = "R: Slave = " + f"{slv_addr:02X}" + ", Data = " + read_str
+        result_txt = "Slave = " + f"{slv_addr:02X}" + ", Data = " + read_str
         if self.gui.v.i2c_bool.get():
             print(result_txt)
         if self.gui.v.log_bool.get():
             if sub_errno != 0:
                 logfile = open(self.gui.v.logfilename.get(), "a")
-                logfile.write("F: " + result_txt + "\n")
+                logfile.write("RF: " + result_txt + "\n")
                 logfile.close()
             else:
                 logfile = open(self.gui.v.logfilename.get(), "a")
@@ -149,13 +149,13 @@ class I2CTab:
         data_num = len(byte_list)
         sub_errno = self.helper.sub_i2c_write(self.hdev, slv_addr, 0, 0, byte_list, data_num)
         write_str = " ".join([f"{ord(x):02X}" for x in byte_list]).strip()
-        result_txt = "W: Slave = " + f"{slv_addr:02X}" + ", Data = " + write_str
+        result_txt = "Slave = " + f"{slv_addr:02X}" + ", Data = " + write_str
         if self.gui.v.i2c_bool.get():
             print(result_txt)
         if self.gui.v.log_bool.get():
             if sub_errno != 0:
                 logfile = open(self.gui.v.logfilename.get(), "a")
-                logfile.write("F: " + result_txt + "\n")
+                logfile.write("WF: " + result_txt + "\n")
                 logfile.close()
             else:
                 logfile = open(self.gui.v.logfilename.get(), "a")
@@ -274,7 +274,9 @@ class I2CTab:
         bin = self.mer.l.bina_mod[self.mer.l.names.index(name)]
         for (i, item) in list(enumerate(self.spl.l.names_wo_width)):
             if name == item:
-                read_byte = self.bytes_read(int(self.i2c.v.i2c_slave_addr.get(), 16), addr_dec, 1)
+                pg, num = [int(x) for x in self.spl.l.addr_total[i].split("(")[0].split("-")]
+                addr_dec = int(f"{pg:02X}" + f"{num:02X}", 16)
+                read_byte = self.bytes_read(int(self.i2c.v.slave_addr.get(), 16), addr_dec, 1)
                 try:
                     len(read_byte)
                 except TypeError:
@@ -309,7 +311,8 @@ class I2CTab:
     def read_one_addr(self, addr, modify=False):
         pg, num = [int(x) for x in addr.split("-")]
         pg_idx = self.spl.pages_unique.index(pg)
-        read_byte = self.bytes_read(int(self.i2c.v.i2c_slave_addr.get(), 16), addr_dec, 1)
+        addr_dec = int(f"{pg:02X}" + f"{num:02X}", 16)
+        read_byte = self.bytes_read(int(self.i2c.v.slave_addr.get(), 16), addr_dec, 1)
         try:
             len(read_byte)
         except TypeError:
@@ -325,7 +328,7 @@ class I2CTab:
 
     # Button Functions
     def write(self):
-        write_str = self.i2c.v.i2c_write.get()
+        write_str = self.i2c.v.write.get()
         n = len(write_str.split())
         byte_list = create_string_buffer(n)
         byte_list[0:n] = bytearray().fromhex(write_str)
@@ -338,7 +341,7 @@ class I2CTab:
 
     def read(self):
         self.p.tkst_write(self.tkst_read, delete=True)
-        read_list = self.bytes_read(int(self.i2c.i2c_slave_addr.get(), 16), int("".join(self.i2c.i2c_access_addr.get().split()), 16), int(self.i2c.v.i2c_read_num.get()))
+        read_list = self.bytes_read(int(self.i2c.i2c_slave_addr.get(), 16), int("".join(self.i2c.i2c_access_addr.get().split()), 16), int(self.i2c.v.read_num.get()))
         try:
             len(read_list)
         except TypeError:
@@ -376,8 +379,6 @@ class I2CTab:
             messagebox.showwarning("WARNING", "Must Add Excel")
             return
 
-        iid = str(self.mer.l.names.index("UPDATE_KEY"))
-
         self.write_mod_reg()
         self.p.set_val_by_name("UPDATE_KEY", "#4", "1")
         self.write_mod_reg()
@@ -391,8 +392,6 @@ class I2CTab:
         if "cfg_skip_state_i" not in self.spl.names_wo_width:
             messagebox.showwarning("WARNING", "Must Add Excel")
             return
-
-        iid = str(self.mer.l.names.index("UPDATE_KEY"))
 
         self.write_mod_reg()
         self.p.set_val_by_name("cfg_skip_state_i", "#4", "000400")
@@ -428,7 +427,7 @@ class I2CTab:
         n = int(new_bin, 2)
         eep_addr = 0
         for i in range(n):
-            read_list, result = self.sub20_i2c_read(int(self.eep.v.eep_slave_addr, 16), eep_addr, 2)
+            read_list, result = self.sub20_i2c_read(int(self.eep.v.slave_addr, 16), eep_addr, 2)
             time.sleep(0.1)
             try:
                 len(read_list)

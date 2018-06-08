@@ -12,6 +12,7 @@ import re
 class EEPROMTab:
     def __init__(self, parent):
         self.p = parent
+        self.gui = self.p.gui
         self.reg = self.p.reg
         self.tst = self.p.tst
         self.eep = self.p.eep
@@ -21,7 +22,7 @@ class EEPROMTab:
         self.reg_tab = self.p.reg_tab
         self.i2c_tab = self.p.i2c_tab
 
-        top_frm = ttk.Frame(self.p.eep_frm, padding=10)
+        top_frm = ttk.Frame(self.p.eep_frm, padding=self.gui.v.pad.get())
         top_frm.pack(side=TOP, fill=X)
         eep_note = ttk.Notebook(self.p.eep_frm)
         eep_note.pack(side=TOP, fill=BOTH, expand=YES)
@@ -46,17 +47,17 @@ class EEPROMTab:
         self.edid_note = ttk.Notebook(edid_frm)
         self.edid_note.pack(fill=BOTH, expand=YES)
 
-        r_bytes = ttk.Frame(read_note, padding=20)
-        r_page = ttk.Frame(read_note, padding=20)
-        r_index = ttk.Frame(read_note, padding=20)
-        r_file = ttk.Frame(read_note, padding=20)
-        w_bytes = ttk.Frame(write_note, padding=20)
-        w_page = ttk.Frame(write_note, padding=20)
-        w_file = ttk.Frame(write_note, padding=20)
-        exp_pri = ttk.Frame(export_note, padding=20)
-        exp_txt = ttk.Frame(export_note, padding=20)
-        exp_rom = ttk.Frame(export_note, padding=20)
-        ed_data = ttk.Frame(self.edid_note, padding=20)
+        r_bytes = ttk.Frame(read_note, padding=self.gui.v.pad.get() * 2)
+        r_page = ttk.Frame(read_note, padding=self.gui.v.pad.get() * 2)
+        r_index = ttk.Frame(read_note, padding=self.gui.v.pad.get() * 2)
+        r_file = ttk.Frame(read_note, padding=self.gui.v.pad.get() * 2)
+        w_bytes = ttk.Frame(write_note, padding=self.gui.v.pad.get() * 2)
+        w_page = ttk.Frame(write_note, padding=self.gui.v.pad.get() * 2)
+        w_file = ttk.Frame(write_note, padding=self.gui.v.pad.get() * 2)
+        exp_pri = ttk.Frame(export_note, padding=self.gui.v.pad.get() * 2)
+        exp_txt = ttk.Frame(export_note, padding=self.gui.v.pad.get() * 2)
+        exp_rom = ttk.Frame(export_note, padding=self.gui.v.pad.get() * 2)
+        ed_data = ttk.Frame(self.edid_note, padding=self.gui.v.pad.get() * 1.8)
         ed_name = ttk.Frame(self.edid_note)
         self.ed_hid0 = ttk.Frame(self.edid_note)
         ed_addr = ttk.Frame(self.edid_note)
@@ -81,16 +82,16 @@ class EEPROMTab:
 
         ttk.Label(top_frm, text="I\u00b2C Slave Address (hex) ").grid(row=0, column=0, sticky=NE)
         ttk.Label(top_frm, text="I\u00b2C Access Address (hex, 2-byte) ").grid(row=1, column=0, sticky=NE)
-        ttk.Entry(top_frm, textvariable=self.eep.v.eep_slave_addr, width=2).grid(row=0, column=1, sticky=NW)
-        ttk.Entry(top_frm, textvariable=self.eep.v.eep_access_addr, width=5).grid(row=1, column=1, sticky=NW)
+        ttk.Entry(top_frm, textvariable=self.eep.v.slave_addr, width=2).grid(row=0, column=1, sticky=NW)
+        ttk.Entry(top_frm, textvariable=self.eep.v.access_addr, width=5).grid(row=1, column=1, sticky=NW)
 
         ttk.Label(r_bytes, text="# of Reading Bytes (dec) ").grid(row=0, column=0, pady=(0, 5), sticky=NW)
         ttk.Label(r_bytes, text="I\u00b2C Access Data").grid(row=2, column=0, columnspan=2, ipadx=30, pady=(10, 5), sticky=N)
-        ttk.Entry(r_bytes, textvariable=self.eep.v.eep_read_num, width=5).grid(row=0, column=1, pady=(0, 5), sticky=NW)
-        ttk.Entry(r_bytes, textvariable=self.eep.v.eep_write, width=30).grid(row=3, column=1, sticky=W)
+        ttk.Entry(r_bytes, textvariable=self.eep.v.read_num, width=5).grid(row=0, column=1, pady=(0, 5), sticky=NW)
+        ttk.Entry(r_bytes, textvariable=self.eep.v.write, width=30).grid(row=3, column=1, sticky=W)
         ttk.Button(r_bytes, text="Read", command=self.eep_read).grid(row=1, column=0, padx=(0, 5), sticky=NE)
         ttk.Button(r_bytes, text="Write", command=self.eep_write).grid(row=3, column=0, padx=(0, 5), sticky=NE)
-        self.tkst_r_read = tkst(r_bytes, width=30, height=12)
+        self.tkst_r_read = tkst(r_bytes, width=30, height=12, state=DISABLED)
         self.tkst_r_read.grid(row=1, column=1, sticky=NW)
 
         r_pg0 = ttk.Frame(r_page)
@@ -103,78 +104,78 @@ class EEPROMTab:
         r_pg3.pack(fill=X)
         ttk.Button(r_pg0, text="Read", command=self.eep_pg_read).grid(row=0, column=0, columnspan=4, pady=(0, 20), sticky=NW)
         ttk.Label(r_pg0, text="Page ID").grid(row=1, column=0, sticky=NW)
-        ttk.Entry(r_pg0, textvariable=self.eep.v.eep_pg_id, width=3, state="readonly").grid(row=1, column=1, padx=5, sticky=NW)
+        ttk.Entry(r_pg0, textvariable=self.eep.v.pg_id, width=3, state="readonly").grid(row=1, column=1, padx=5, sticky=NW)
         ttk.Label(r_pg0, text=" Page length").grid(row=1, column=2, padx=5, sticky=NW)
-        ttk.Entry(r_pg0, textvariable=self.eep.v.eep_pg_len, width=3, state="readonly").grid(row=1, column=3, sticky=NW)
+        ttk.Entry(r_pg0, textvariable=self.eep.v.pg_len, width=3, state="readonly").grid(row=1, column=3, sticky=NW)
         ttk.Label(r_pg1, text="Page data").grid(row=0, column=0, padx=(0, 5), pady=10, sticky=NW)
-        self.tkst_page = tkst(r_pg1, width=30, height=12)
+        self.tkst_page = tkst(r_pg1, width=30, height=12, state=DISABLED)
         self.tkst_page.grid(row=0, column=1, pady=(10, 20), sticky=NW)
         ttk.Label(r_pg2, text="Page CRC (read)").grid(row=0, column=0, sticky=NW)
-        ttk.Entry(r_pg2, textvariable=self.eep.v.eep_crc_read, width=3, state="readonly").grid(row=0, column=1, padx=5, sticky=NW)
+        ttk.Entry(r_pg2, textvariable=self.eep.v.crc_read, width=3, state="readonly").grid(row=0, column=1, padx=5, sticky=NW)
         ttk.Label(r_pg2, text=" Page CRC (sum)").grid(row=0, column=2, padx=5, sticky=NW)
-        ttk.Entry(r_pg2, textvariable=self.eep.v.eep_crc_sum, width=3, state="readonly").grid(row=0, column=3, padx=(0, 10), sticky=NW)
+        ttk.Entry(r_pg2, textvariable=self.eep.v.crc_sum, width=3, state="readonly").grid(row=0, column=3, padx=(0, 10), sticky=NW)
         ttk.Label(r_pg2, text=" Page CRC (offset) ").grid(row=0, column=4, sticky=NW)
-        ttk.Entry(r_pg2, textvariable=self.eep.v.eep_crc_ofs, width=3).grid(row=0, column=5, sticky=NW)
+        ttk.Entry(r_pg2, textvariable=self.eep.v.crc_ofs, width=3).grid(row=0, column=5, sticky=NW)
         ttk.Label(r_pg3, text="Next Page Start ").grid(row=0, column=0, pady=10)
-        ttk.Entry(r_pg3, textvariable=self.eep.v.eep_next_pg, width=5, state="readonly").grid(row=0, column=1, pady=10)
+        ttk.Entry(r_pg3, textvariable=self.eep.v.next_pg, width=5, state="readonly").grid(row=0, column=1, pady=10)
 
         idx_top = ttk.Frame(r_index)
         idx_top.pack(side=TOP, fill=X)
         ttk.Button(idx_top, text="Read Page Indices", width=15, command=self.eep_pg_idx_read).grid(row=0, column=0, padx=(0, 50), sticky=NW)
         ttk.Label(idx_top, text="EEPROM Checksum: ").grid(row=0, column=1, sticky=W)
-        ttk.Entry(idx_top, textvariable=self.eep.v.eep_crc_ofs, width=3).grid(row=0, column=2, sticky=W)
-        self.idx_frm = ttk.Frame(r_index, padding=10)
+        ttk.Entry(idx_top, textvariable=self.eep.v.crc_ofs, width=3).grid(row=0, column=2, sticky=W)
+        self.idx_frm = ttk.Frame(r_index, padding=self.gui.v.pad.get())
         self.idx_frm.pack(side=TOP, fill=BOTH, expand=YES)
 
         file_top = ttk.Frame(r_file)
         file_top.pack(side=TOP, fill=X)
         ttk.Button(file_top, text="Read & Save", width=15, command=self.eep_read_save).grid(row=0, column=0, padx=(0, 50), sticky=NW)
         ttk.Label(file_top, text="EEPROM Checksum: ").grid(row=0, column=1, sticky=W)
-        ttk.Entry(file_top, textvariable=self.eep.v.eep_crc_ofs, width=3).grid(row=0, column=2, sticky=W)
-        self.file_frm = ttk.Frame(r_file, padding=5)
+        ttk.Entry(file_top, textvariable=self.eep.v.crc_ofs, width=3).grid(row=0, column=2, sticky=W)
+        self.file_frm = ttk.Frame(r_file, padding=self.gui.v.pad.get() * 0.5)
         self.file_frm.pack(side=TOP, fill=BOTH, expand=YES)
 
         ttk.Label(w_bytes, text="I\u00b2C Access Data").grid(row=0, column=0, columnspan=2, ipadx=30, pady=(0, 5), sticky=N)
         ttk.Button(w_bytes, text="Write", command=self.eep_write).grid(row=1, column=0, padx=(0, 5), sticky=NE)
-        ttk.Entry(w_bytes, textvariable=self.eep.v.eep_write, width=30).grid(row=1, column=1, sticky=W)
+        ttk.Entry(w_bytes, textvariable=self.eep.v.write, width=30).grid(row=1, column=1, sticky=W)
         ttk.Label(w_bytes, text="# of Reading Bytes (dec) ").grid(row=2, column=0, pady=(10, 5), sticky=NW)
-        ttk.Entry(w_bytes, textvariable=self.eep.v.eep_read_num, width=5).grid(row=2, column=1, pady=(10, 5), sticky=NW)
+        ttk.Entry(w_bytes, textvariable=self.eep.v.read_num, width=5).grid(row=2, column=1, pady=(10, 5), sticky=NW)
         ttk.Button(w_bytes, text="Read", command=self.eep_read).grid(row=3, column=0, padx=(0, 5), sticky=NE)
-        self.tkst_w_read = tkst(w_bytes, width=30, height=12)
+        self.tkst_w_read = tkst(w_bytes, width=30, height=12, state=DISABLED)
         self.tkst_w_read.grid(row=3, column=1, sticky=NW)
 
         ttk.Label(w_page, text="Page CRC (offset) ").grid(row=0, column=0, sticky=NE)
-        ttk.Entry(w_page, textvariable=self.eep.v.eep_crc_ofs, width=3).grid(row=0, column=1, sticky=NW)
+        ttk.Entry(w_page, textvariable=self.eep.v.crc_ofs, width=3).grid(row=0, column=1, sticky=NW)
         ttk.Button(w_page, text="Write 1 Page", command=self.eep_write_1_pg).grid(row=1, column=0, padx=(0, 5), pady=(5, 0), sticky=NE)
-        ttk.Entry(w_page, textvariable=self.eep.v.eep_write_1, width=3).grid(row=1, column=1, pady=(7, 0), sticky=NW)
+        ttk.Entry(w_page, textvariable=self.eep.v.write_1, width=3).grid(row=1, column=1, pady=(7, 0), sticky=NW)
         ttk.Button(w_page, text="Write Listed Pages", command=self.eep_write_listed_pg).grid(row=2, column=0, padx=(0, 5), pady=(5, 0), sticky=NE)
-        ttk.Entry(w_page, textvariable=self.eep.v.eep_write_list, width=30).grid(row=2, column=1, pady=(7, 0), sticky=NW)
+        ttk.Entry(w_page, textvariable=self.eep.v.write_list, width=30).grid(row=2, column=1, pady=(7, 0), sticky=NW)
         ttk.Button(w_page, text="Write Modified Pages", command=self.eep_write_mod_pg).grid(row=3, column=0, padx=(0, 5), pady=(5, 0), sticky=NE)
-        ttk.Entry(w_page, textvariable=self.eep.v.eep_check_mod, width=30, state="readonly").grid(row=3, column=1, pady=(7, 0), sticky=NW)
+        ttk.Entry(w_page, textvariable=self.eep.v.check_mod, width=30, state="readonly").grid(row=3, column=1, pady=(7, 0), sticky=NW)
 
         ttk.Button(w_file, text="Write", command=self.eep_file_write).grid(row=0, column=0)
 
         ttk.Label(exp_pri, text="Main Page ").grid(row=0, column=0, sticky=NE)
         ttk.Label(exp_pri, text="Core Page ").grid(row=1, column=0, pady=5, sticky=NE)
         ttk.Label(exp_pri, text="Base Page ").grid(row=2, column=0, sticky=NE)
-        ttk.Entry(exp_pri, textvariable=self.eep.v.eep_pri_main, width=5).grid(row=0, column=1, sticky=NW)
-        ttk.Entry(exp_pri, textvariable=self.eep.v.eep_pri_core, width=30).grid(row=1, column=1, pady=5, sticky=NW)
-        ttk.Entry(exp_pri, textvariable=self.eep.v.eep_pri_base, width=30).grid(row=2, column=1, sticky=NW)
+        ttk.Entry(exp_pri, textvariable=self.eep.v.pri_main, width=5).grid(row=0, column=1, sticky=NW)
+        ttk.Entry(exp_pri, textvariable=self.eep.v.pri_core, width=30).grid(row=1, column=1, pady=5, sticky=NW)
+        ttk.Entry(exp_pri, textvariable=self.eep.v.pri_base, width=30).grid(row=2, column=1, sticky=NW)
 
         ttk.Label(exp_txt, text="Page CRC (offset) ").grid(row=0, column=0, columnspan=2, sticky=NE)
-        ttk.Entry(exp_txt, textvariable=self.eep.v.eep_crc_ofs, width=3).grid(row=0, column=2, sticky=NW)
+        ttk.Entry(exp_txt, textvariable=self.eep.v.crc_ofs, width=3).grid(row=0, column=2, sticky=NW)
         ttk.Label(exp_txt, text="Include EEPROM Control Page ").grid(row=1, column=0, columnspan=2, pady=(5, 0), sticky=NE)
-        ttk.Checkbutton(exp_txt, variable=self.eep.v.eep_check).grid(row=1, column=2, pady=(5, 0), sticky=NW)
+        ttk.Checkbutton(exp_txt, variable=self.eep.v.check).grid(row=1, column=2, pady=(5, 0), sticky=NW)
         ttk.Label(exp_txt, text="").grid(row=2, column=0, columnspan=3)
         ttk.Button(exp_txt, text="Check\nModified Pages", width=12, style="Center.TButton", command=self.p.check_mod).grid(row=3, column=0, rowspan=2, padx=(0, 5), sticky=NE)
         ttk.Button(exp_txt, text="Remove\nDuplicated Pages", width=14, style="Center.TButton", command=self.remove_dup_mod).grid(row=3, column=1, rowspan=2, padx=(0, 5), sticky=NE)
-        ttk.Entry(exp_txt, textvariable=self.eep.v.eep_check_mod, width=30).grid(row=3, column=2, pady=(1, 0), sticky=NW)
+        ttk.Entry(exp_txt, textvariable=self.eep.v.check_mod, width=30).grid(row=3, column=2, pady=(1, 0), sticky=NW)
         ttk.Button(exp_txt, text="Import Extra\nROM File", width=12, style="Center.TButton", command=self.import_rom).grid(row=5, column=0, rowspan=2, padx=(0, 5), pady=(5, 0), sticky=NE)
         ttk.Button(exp_txt, text="Remove\nDuplicated Pages", width=14, style="Center.TButton", command=self.remove_dup_imp).grid(row=5, column=1, rowspan=2, padx=(0, 5), pady=(5, 0), sticky=NE)
-        ttk.Entry(exp_txt, textvariable=self.eep.v.eep_import_rom, width=30).grid(row=5, column=2, pady=(6, 0), sticky=NW)
-        self.exp_imported = ttk.Label(exp_txt, textvariable=self.eep.v.eep_txtfile[0], foreground="gray50")
+        ttk.Entry(exp_txt, textvariable=self.eep.v.import_rom, width=30).grid(row=5, column=2, pady=(6, 0), sticky=NW)
+        self.exp_imported = ttk.Label(exp_txt, textvariable=self.eep.v.txtfile[0], foreground="gray50")
         ttk.Button(exp_txt, text="Concatenate Exporting Pages", command=self.concatenate).grid(row=7, column=0, columnspan=2, padx=(0, 5), pady=(5, 0), sticky=NE)
-        ttk.Entry(exp_txt, textvariable=self.eep.v.eep_conc, width=30, state="readonly").grid(row=7, column=2, pady=(5, 0), sticky=W)
+        ttk.Entry(exp_txt, textvariable=self.eep.v.conc, width=30, state="readonly").grid(row=7, column=2, pady=(5, 0), sticky=W)
         ttk.Button(exp_txt, text="Export as Plain Text", width=22, command=self.export_plain_txt).grid(row=8, column=0, columnspan=3, padx=(265, 0), pady=(5, 0), sticky=NW)
         ttk.Button(exp_txt, text="Export as TMD Command", width=22, command=self.export_tmd_cmd).grid(row=9, column=0, columnspan=3, padx=(265, 0), pady=(5, 0), sticky=NW)
         ttk.Label(exp_txt, text="\n").grid(row=10, column=0, columnspan=3)
@@ -182,14 +183,14 @@ class EEPROMTab:
         ttk.Label(exp_txt, text="Core Page ").grid(row=12, column=0, columnspan=2, pady=(5, 0), sticky=NE)
         ttk.Label(exp_txt, text="Base Page ").grid(row=13, column=0, columnspan=2, pady=(5, 0), sticky=NE)
         ttk.Label(exp_txt, text="Full Page ").grid(row=14, column=0, columnspan=2, pady=(5, 0), sticky=NE)
-        ttk.Entry(exp_txt, textvariable=self.eep.v.eep_txt_main, width=30, state="readonly").grid(row=11, column=2, sticky=NW)
-        ttk.Entry(exp_txt, textvariable=self.eep.v.eep_txt_core, width=30, state="readonly").grid(row=12, column=2, pady=(5, 0), sticky=NW)
-        ttk.Entry(exp_txt, textvariable=self.eep.v.eep_txt_base, width=30, state="readonly").grid(row=13, column=2, pady=(5, 0), sticky=NW)
-        self.eep_txt_full = tkst(exp_txt, width=30, height=3)
+        ttk.Entry(exp_txt, textvariable=self.eep.v.txt_main, width=30, state="readonly").grid(row=11, column=2, sticky=NW)
+        ttk.Entry(exp_txt, textvariable=self.eep.v.txt_core, width=30, state="readonly").grid(row=12, column=2, pady=(5, 0), sticky=NW)
+        ttk.Entry(exp_txt, textvariable=self.eep.v.txt_base, width=30, state="readonly").grid(row=13, column=2, pady=(5, 0), sticky=NW)
+        self.eep_txt_full = tkst(exp_txt, width=30, height=3, state=DISABLED)
         self.eep_txt_full.grid(row=14, column=2, columnspan=2, pady=(5, 0), sticky=NW)
 
-        imp0 = ttk.Frame(import_frm, padding=20)
-        imp1 = ttk.Frame(import_frm, padding=20)
+        imp0 = ttk.Frame(import_frm, padding=self.gui.v.pad.get() * 2)
+        imp1 = ttk.Frame(import_frm, padding=self.gui.v.pad.get() * 2)
         imp0.place(relx=0, rely=0, relwidth=0.7, relheight=1)
         imp1.place(relx=0.7, rely=0, relwidth=0.3, relheight=1)
         imp0_top = ttk.Frame(imp0)
@@ -212,7 +213,7 @@ class EEPROMTab:
         self.imp_tree.tag_configure("check", background="DarkOliveGreen3")
         self.imp_tree.tag_configure("gray", background="gray80", foreground="gray50")
         self.imp_tree.bind("<Button-3>", self.check)
-        ttk.Label(imp0_bot, textvariable=self.eep.v.eep_txtfile[1], foreground="gray50").pack(side=BOTTOM, fill=X, anchor=W, pady=(2, 0))
+        ttk.Label(imp0_bot, textvariable=self.eep.v.txtfile[1], foreground="gray50").pack(side=BOTTOM, fill=X, anchor=W, pady=(2, 0))
         ttk.Button(imp1, text="Import EEPROM", width=20, command=self.eep_import).pack(side=TOP, anchor=CENTER, padx=(0, 15), pady=(20, 0), ipady=3)
         ttk.Button(imp1, text="Apply Values", width=20, command=self.apply_values).pack(side=TOP, anchor=CENTER, padx=(0, 15), pady=(15, 0), ipady=3)
         ttk.Button(imp1, text="Select All", width=20, command=self.select_all).pack(side=TOP, anchor=CENTER, padx=(0, 15), pady=(15, 0), ipady=3)
@@ -223,51 +224,60 @@ class EEPROMTab:
         data_r = ttk.Frame(ed_data)
         data_l.place(relx=0, rely=0, relwidth=0.75, relheight=1)
         data_r.place(relx=0.75, rely=0, relwidth=0.25, relheight=1)
+        self.data_cv = Canvas(data_l)
+        self.data_cv.pack(side=LEFT, fill=BOTH, expand=YES)
+        data_frm = ttk.Frame(self.data_cv)
+        self.data_cv.create_window(0, 0, anchor=NW, window=data_frm)
+        data_sb = Scrollbar(data_l, orient=VERTICAL, command=self.data_cv.yview)
+        data_sb.pack(anchor=E, side=LEFT, fill=Y)
+        self.data_cv.config(yscrollcommand=data_sb.set)
+        data_l.bind("<Configure>", self.resize)
+
         for i in range(4):
             if i == 0:
                 pad0 = 3
                 pad1 = 0
             else:
-                pad0 = 30
-                pad1 = 27
-            ttk.Label(data_l, text="Descriptor " + str(i + 1) + "\n").grid(row=i * 4, column=0, columnspan=10, pady=(pad0, 0), sticky=SW)
-            ttk.Button(data_l, text="Calc Frequency", command=lambda num=i: self.calc_freq(num)).grid(row=i * 4, column=0, columnspan=10, padx=(80, 0), pady=(pad1, 0), sticky=NW)
-            ttk.Button(data_l, text="Calc Refresh", command=lambda num=i: self.calc_rfsh(num)).grid(row=i * 4, column=0, columnspan=10, padx=(180, 0), pady=(pad1, 0), sticky=NW)
-            ttk.Label(data_l, text="H active").grid(row=i * 4 + 1, column=0, padx=(30, 0), pady=(5, 0), sticky=NE)
-            ttk.Label(data_l, text="H blank").grid(row=i * 4 + 1, column=2, padx=(20, 0), pady=(5, 0), sticky=NE)
-            ttk.Label(data_l, text="H front-porch").grid(row=i * 4 + 1, column=4, padx=(20, 0), pady=(5, 0), sticky=NE)
-            ttk.Label(data_l, text="H back-porch").grid(row=i * 4 + 1, column=6, padx=(20, 0), pady=(5, 0), sticky=NE)
-            ttk.Label(data_l, text="H sync").grid(row=i * 4 + 1, column=8, padx=(20, 0), pady=(5, 0), sticky=NE)
-            ttk.Label(data_l, text="V active").grid(row=i * 4 + 2, column=0, padx=(30, 0), pady=(5, 0), sticky=NE)
-            ttk.Label(data_l, text="V blank").grid(row=i * 4 + 2, column=2, padx=(20, 0), pady=(5, 0), sticky=NE)
-            ttk.Label(data_l, text="V front-porch").grid(row=i * 4 + 2, column=4, padx=(20, 0), pady=(5, 0), sticky=NE)
-            ttk.Label(data_l, text="V back-porch").grid(row=i * 4 + 2, column=6, padx=(20, 0), pady=(5, 0), sticky=NE)
-            ttk.Label(data_l, text="V sync").grid(row=i * 4 + 2, column=8, padx=(20, 0), pady=(5, 0), sticky=NE)
-            ttk.Label(data_l, text="Frequency (MHz)").grid(row=i * 4 + 3, column=0, padx=(30, 0), pady=(5, 0), sticky=NE)
-            ttk.Label(data_l, text="Refresh (Hz)").grid(row=i * 4 + 3, column=2, padx=(20, 0), pady=(5, 0), sticky=NE)
-            ttk.Entry(data_l, textvariable=self.eep.v.hac[i], width=5).grid(row=i * 4 + 1, column=1, padx=(5, 0), pady=(5, 0), sticky=NW)
-            ttk.Entry(data_l, textvariable=self.eep.v.hbl[i], width=5).grid(row=i * 4 + 1, column=3, padx=(5, 0), pady=(5, 0), sticky=NW)
-            ttk.Entry(data_l, textvariable=self.eep.v.hfp[i], width=5).grid(row=i * 4 + 1, column=5, padx=(5, 0), pady=(5, 0), sticky=NW)
-            ttk.Entry(data_l, textvariable=self.eep.v.hbp[i], width=5, state="readonly").grid(row=i * 4 + 1, column=7, padx=(5, 0), pady=(5, 0), sticky=NW)
-            ttk.Entry(data_l, textvariable=self.eep.v.hsy[i], width=5).grid(row=i * 4 + 1, column=9, padx=(5, 0), pady=(5, 0), sticky=NW)
-            ttk.Entry(data_l, textvariable=self.eep.v.vac[i], width=5).grid(row=i * 4 + 2, column=1, padx=(5, 0), pady=(5, 0), sticky=NW)
-            ttk.Entry(data_l, textvariable=self.eep.v.vbl[i], width=5).grid(row=i * 4 + 2, column=3, padx=(5, 0), pady=(5, 0), sticky=NW)
-            ttk.Entry(data_l, textvariable=self.eep.v.vfp[i], width=5).grid(row=i * 4 + 2, column=5, padx=(5, 0), pady=(5, 0), sticky=NW)
-            ttk.Entry(data_l, textvariable=self.eep.v.vbp[i], width=5, state="readonly").grid(row=i * 4 + 2, column=7, padx=(5, 0), pady=(5, 0), sticky=NW)
-            ttk.Entry(data_l, textvariable=self.eep.v.vsy[i], width=5).grid(row=i * 4 + 2, column=9, padx=(5, 0), pady=(5, 0), sticky=NW)
-            ttk.Entry(data_l, textvariable=self.eep.v.freq[i], width=5).grid(row=i * 4 + 3, column=1, padx=(5, 0), pady=(5, 0), sticky=NW)
-            ttk.Entry(data_l, textvariable=self.eep.v.rfsh[i], width=5).grid(row=i * 4 + 3, column=3, padx=(5, 0), pady=(5, 0), sticky=NW)
+                pad0 = self.gui.v.pad.get() * 2.7 + 3
+                pad1 = self.gui.v.pad.get() * 2.7
+            ttk.Label(data_frm, text="Descriptor " + str(i + 1) + "\n").grid(row=i * 4, column=0, columnspan=10, pady=(pad0, 0), sticky=SW)
+            ttk.Button(data_frm, text="Calc Frequency", command=lambda num=i: self.calc_freq(num)).grid(row=i * 4, column=0, columnspan=10, padx=(80, 0), pady=(pad1, 0), sticky=NW)
+            ttk.Button(data_frm, text="Calc Refresh", command=lambda num=i: self.calc_rfsh(num)).grid(row=i * 4, column=0, columnspan=10, padx=(180, 0), pady=(pad1, 0), sticky=NW)
+            ttk.Label(data_frm, text="H active").grid(row=i * 4 + 1, column=0, padx=(30, 0), pady=(5, 0), sticky=NE)
+            ttk.Label(data_frm, text="H blank").grid(row=i * 4 + 1, column=2, padx=(20, 0), pady=(5, 0), sticky=NE)
+            ttk.Label(data_frm, text="H front-porch").grid(row=i * 4 + 1, column=4, padx=(20, 0), pady=(5, 0), sticky=NE)
+            ttk.Label(data_frm, text="H back-porch").grid(row=i * 4 + 1, column=6, padx=(20, 0), pady=(5, 0), sticky=NE)
+            ttk.Label(data_frm, text="H sync").grid(row=i * 4 + 1, column=8, padx=(20, 0), pady=(5, 0), sticky=NE)
+            ttk.Label(data_frm, text="V active").grid(row=i * 4 + 2, column=0, padx=(30, 0), pady=(5, 0), sticky=NE)
+            ttk.Label(data_frm, text="V blank").grid(row=i * 4 + 2, column=2, padx=(20, 0), pady=(5, 0), sticky=NE)
+            ttk.Label(data_frm, text="V front-porch").grid(row=i * 4 + 2, column=4, padx=(20, 0), pady=(5, 0), sticky=NE)
+            ttk.Label(data_frm, text="V back-porch").grid(row=i * 4 + 2, column=6, padx=(20, 0), pady=(5, 0), sticky=NE)
+            ttk.Label(data_frm, text="V sync").grid(row=i * 4 + 2, column=8, padx=(20, 0), pady=(5, 0), sticky=NE)
+            ttk.Label(data_frm, text="Frequency (MHz)").grid(row=i * 4 + 3, column=0, padx=(30, 0), pady=(5, 0), sticky=NE)
+            ttk.Label(data_frm, text="Refresh (Hz)").grid(row=i * 4 + 3, column=2, padx=(20, 0), pady=(5, 0), sticky=NE)
+            ttk.Entry(data_frm, textvariable=self.eep.v.hac[i], width=5).grid(row=i * 4 + 1, column=1, padx=(5, 0), pady=(5, 0), sticky=NW)
+            ttk.Entry(data_frm, textvariable=self.eep.v.hbl[i], width=5).grid(row=i * 4 + 1, column=3, padx=(5, 0), pady=(5, 0), sticky=NW)
+            ttk.Entry(data_frm, textvariable=self.eep.v.hfp[i], width=5).grid(row=i * 4 + 1, column=5, padx=(5, 0), pady=(5, 0), sticky=NW)
+            ttk.Entry(data_frm, textvariable=self.eep.v.hbp[i], width=5, state="readonly").grid(row=i * 4 + 1, column=7, padx=(5, 0), pady=(5, 0), sticky=NW)
+            ttk.Entry(data_frm, textvariable=self.eep.v.hsy[i], width=5).grid(row=i * 4 + 1, column=9, padx=(5, 0), pady=(5, 0), sticky=NW)
+            ttk.Entry(data_frm, textvariable=self.eep.v.vac[i], width=5).grid(row=i * 4 + 2, column=1, padx=(5, 0), pady=(5, 0), sticky=NW)
+            ttk.Entry(data_frm, textvariable=self.eep.v.vbl[i], width=5).grid(row=i * 4 + 2, column=3, padx=(5, 0), pady=(5, 0), sticky=NW)
+            ttk.Entry(data_frm, textvariable=self.eep.v.vfp[i], width=5).grid(row=i * 4 + 2, column=5, padx=(5, 0), pady=(5, 0), sticky=NW)
+            ttk.Entry(data_frm, textvariable=self.eep.v.vbp[i], width=5, state="readonly").grid(row=i * 4 + 2, column=7, padx=(5, 0), pady=(5, 0), sticky=NW)
+            ttk.Entry(data_frm, textvariable=self.eep.v.vsy[i], width=5).grid(row=i * 4 + 2, column=9, padx=(5, 0), pady=(5, 0), sticky=NW)
+            ttk.Entry(data_frm, textvariable=self.eep.v.freq[i], width=5).grid(row=i * 4 + 3, column=1, padx=(5, 0), pady=(5, 0), sticky=NW)
+            ttk.Entry(data_frm, textvariable=self.eep.v.rfsh[i], width=5).grid(row=i * 4 + 3, column=3, padx=(5, 0), pady=(5, 0), sticky=NW)
             self.eep.v.hbl[i].trace("w", lambda name, index, mode, num=i, type="H": self.calc_bp(num, type))
             self.eep.v.hfp[i].trace("w", lambda name, index, mode, num=i, type="H": self.calc_bp(num, type))
             self.eep.v.hsy[i].trace("w", lambda name, index, mode, num=i, type="H": self.calc_bp(num, type))
             self.eep.v.vbl[i].trace("w", lambda name, index, mode, num=i, type="V": self.calc_bp(num, type))
             self.eep.v.vfp[i].trace("w", lambda name, index, mode, num=i, type="V": self.calc_bp(num, type))
             self.eep.v.vsy[i].trace("w", lambda name, index, mode, num=i, type="V": self.calc_bp(num, type))
-        ttk.Label(data_l, text="\n").grid(row=16, column=0, columnspan=10)
-        ttk.Label(data_l, text="Page Offset\n").grid(row=17, column=0, columnspan=10, pady=(3, 0), sticky=W)
-        ttk.Button(data_l, text="Calc EDID Checksum", command=self.calc_crc).grid(row=17, column=0, columnspan=10, padx=(80, 0), sticky=NW)
-        ttk.Label(data_l, text="Checksum", state="readonly").grid(row=18, column=0, padx=(30, 0), pady=(5, 0), sticky=NE)
-        ttk.Entry(data_l, textvariable=self.eep.v.edid_checksum, width=3, state="readonly").grid(row=18, column=1, padx=(5, 0), pady=(5, 0), sticky=NW)
+        ttk.Label(data_frm, text="\n").grid(row=16, column=0, columnspan=10)
+        ttk.Label(data_frm, text="Page Offset\n").grid(row=17, column=0, columnspan=10, pady=(3, 0), sticky=W)
+        ttk.Button(data_frm, text="Calc EDID Checksum", command=self.calc_crc).grid(row=17, column=0, columnspan=10, padx=(80, 0), sticky=NW)
+        ttk.Label(data_frm, text="Checksum", state="readonly").grid(row=18, column=0, padx=(30, 0), pady=(5, 0), sticky=NE)
+        ttk.Entry(data_frm, textvariable=self.eep.v.edid_checksum, width=3, state="readonly").grid(row=18, column=1, padx=(5, 0), pady=(5, 0), sticky=NW)
         ttk.Button(data_r, text="Load Data", width=20, command=self.ed_load).pack(side=TOP, pady=(20, 0), ipady=3)
         ttk.Button(data_r, text="Set Data", width=20, command=self.ed_set).pack(side=TOP, pady=(15, 0), ipady=3)
         ttk.Button(data_r, text="Set Default", width=20, command=self.ed_set_default).pack(side=TOP, pady=(15, 0), ipady=3)
@@ -284,7 +294,7 @@ class EEPROMTab:
         ttk.Button(ed_name_ctrl_frm, text="Import Modified Byte List", width=23, command=self.p.imp_byte).pack(side=TOP, anchor=CENTER, pady=(0, 3), ipadx=3)
         ttk.Button(ed_name_ctrl_frm, text="Export Modified Byte List", width=23, command=self.p.exp_byte).pack(side=TOP, anchor=CENTER, pady=(0, 13), ipadx=3)
         ttk.Button(ed_name_ctrl_frm, text="Check Modified Pages", width=23, command=self.p.check_mod).pack(side=TOP, anchor=CENTER, pady=(0, 3), ipadx=3)
-        ttk.Entry(ed_name_ctrl_frm, textvariable=self.eep.v.eep_check_mod, width=23, state="readonly").pack(side=TOP, anchor=CENTER, ipadx=4)
+        ttk.Entry(ed_name_ctrl_frm, textvariable=self.eep.v.check_mod, width=23, state="readonly").pack(side=TOP, anchor=CENTER, ipadx=4)
         ttk.Label(ed_name_ctrl_frm, text="\n").pack(side=TOP, fill=X)
         ttk.Checkbutton(ed_name_ctrl_frm, text="Show Hidden Tab", variable=self.eep.v.ed_check0, command=lambda choice="name": self.show_hide(choice)).pack(side=TOP)
         self.ed_name_tree = ttk.Treeview(ed_name_tree_frm, columns=("col1", "col2", "col3", "col4", "col5", "col6", "col7"))
@@ -321,7 +331,7 @@ class EEPROMTab:
         ttk.Button(ed_addr_ctrl_frm, text="Import Modified Byte List", width=23, command=self.p.imp_byte).pack(side=TOP, anchor=CENTER, pady=(0, 3), ipadx=3)
         ttk.Button(ed_addr_ctrl_frm, text="Export Modified Byte List", width=23, command=self.p.exp_byte).pack(side=TOP, anchor=CENTER, pady=(0, 13), ipadx=3)
         ttk.Button(ed_addr_ctrl_frm, text="Check Modified Pages", width=23, command=self.p.check_mod).pack(side=TOP, anchor=CENTER, pady=(0, 3), ipadx=3)
-        ttk.Entry(ed_addr_ctrl_frm, textvariable=self.eep.v.eep_check_mod, width=23, state="readonly").pack(side=TOP, anchor=CENTER, ipadx=4)
+        ttk.Entry(ed_addr_ctrl_frm, textvariable=self.eep.v.check_mod, width=23, state="readonly").pack(side=TOP, anchor=CENTER, ipadx=4)
         ttk.Label(ed_addr_ctrl_frm, text="\n").pack(side=TOP, fill=X)
         ttk.Checkbutton(ed_addr_ctrl_frm, text="Show Hidden Tab", variable=self.eep.v.ed_check1, command=lambda choice="addr": self.show_hide(choice)).pack(side=TOP)
         self.ed_addr_tree = ttk.Treeview(ed_addr_tree_frm, columns=tuple(self.reg.l.hex_col + ["last"]))
@@ -401,7 +411,7 @@ class EEPROMTab:
 
     # Read
     def eep_read(self):
-        read_list, result = self.i2c_tab.sub20_i2c_read(int(self.eep.v.eep_slave_addr.get(), 16), int("".join(self.eep.v.eep_access_addr.get().split()), 16), int(self.eep.v.eep_read_num.get()))
+        read_list, result = self.i2c_tab.sub20_i2c_read(int(self.eep.v.slave_addr.get(), 16), int("".join(self.eep.v.access_addr.get().split()), 16), int(self.eep.v.read_num.get()))
         time.sleep(0.1)
         try:
             len(read_list)
@@ -409,14 +419,14 @@ class EEPROMTab:
             messagebox.showerror("I\u00b2C Read Result", "Read Failed!\n" + result)
         else:
             read_str = " ".join([f"{ord(x):02X}" for x in read_list])
-            self.tkst_r_read.delete("1.0", END)
-            self.tkst_r_read.insert("1.0", read_str)
-            self.tkst_w_read.delete("1.0", END)
-            self.tkst_w_read.insert("1.0", read_str)
+            self.p.tkst_write(self.tkst_r_read, delete=True)
+            self.p.tkst_write(self.tkst_r_read, read_str)
+            self.p.tkst_write(self.tkst_w_read, delete=True)
+            self.p.tkst_write(self.tkst_w_read, read_str)
 
     def eep_pg_read(self):
-        eep_addr = int("".join(self.eep.v.eep_access_addr.get().split()), 16)
-        id_list, result = self.i2c_tab.sub20_i2c_read(int(self.eep.v.eep_slave_addr.get(), 16), eep_addr, 2)
+        eep_addr = int("".join(self.eep.v.access_addr.get().split()), 16)
+        id_list, result = self.i2c_tab.sub20_i2c_read(int(self.eep.v.slave_addr.get(), 16), eep_addr, 2)
         time.sleep(0.1)
 
         try:
@@ -425,10 +435,10 @@ class EEPROMTab:
             messagebox.showerror("I\u00b2C Read Result", "Read Failed!\n" + result)
             return
         else:
-            self.eep.v.eep_pg_id.set(f"{ord(id_list[0]):02X}")
-            self.eep.v.eep_pg_len.set(f"{ord(id_list[1]):02X}")
+            self.eep.v.pg_id.set(f"{ord(id_list[0]):02X}")
+            self.eep.v.pg_len.set(f"{ord(id_list[1]):02X}")
             page_len = int.from_bytes(id_list[1], byteorder="big", signed=False) + 1
-            read_list, result = self.i2c_tab.sub20_i2c_read(int(self.eep.v.eep_slave_addr.get(), 16), eep_addr + 2, page_len)
+            read_list, result = self.i2c_tab.sub20_i2c_read(int(self.eep.v.slave_addr.get(), 16), eep_addr + 2, page_len)
             time.sleep(0.1)
             try:
                 len(read_list)
@@ -437,10 +447,10 @@ class EEPROMTab:
                 return
             else:
                 read_str = " ".join([f"{ord(x):02X}" for x in read_list])
-                self.tkst_page.delete("1.0", END)
-                self.tkst_page.insert("1.0", read_str)
+                self.p.tkst_write(self.tkst_page, delete=True)
+                self.p.tkst_write(self.tkst_page, read_str)
 
-            crc_list, result = self.i2c_tab.sub20_i2c_read(int(self.eep.v.eep_slave_addr.get(), 16), eep_addr + page_len + 2, 1)
+            crc_list, result = self.i2c_tab.sub20_i2c_read(int(self.eep.v.slave_addr.get(), 16), eep_addr + page_len + 2, 1)
             time.sleep(0.1)
             try:
                 len(crc_list)
@@ -448,24 +458,27 @@ class EEPROMTab:
                 messagebox.showerror("I\u00b2C Read Result", "Read Failed!\n" + result)
             else:
                 read_str = " ".join([f"{ord(x):02X}" for x in crc_list])
-                self.eep.v.eep_crc_read.set(read_str)
+                self.eep.v.crc_read.set(read_str)
 
                 checksum = int.from_bytes(id_list[0], byteorder="big", signed=False) + page_len - 1
                 for k in range(len(read_list)):
                     checksum += int.from_bytes(read_list[k], byteorder="big", signed=False)
                 crc256q, crc256m = divmod(checksum, 256)
-                crc_q, crc_v = divmod(256 + int(self.eep.v.eep_crc_ofs.get(), 16) - crc256m, 256)
-                self.eep.v.eep_crc_sum.set(f"{crc_v:02X}")
+                crc_q, crc_v = divmod(256 + int(self.eep.v.crc_ofs.get(), 16) - crc256m, 256)
+                self.eep.v.crc_sum.set(f"{crc_v:02X}")
 
-                self.eep.v.eep_next_pg.set(f"{(eep_addr + page_len + 3):04X}")
+                self.eep.v.next_pg.set(f"{(eep_addr + page_len + 3):04X}")
 
     def eep_pg_idx_read(self):
+        for slave in self.idx_frm.grid_slaves():
+            slave.destroy()
+
         self.eep.l.r_idx_vars = []
         n = 0
         eep_addr = 0
 
         while True:
-            read_list, result = self.i2c_tab.sub20_i2c_read(int(self.eep.v.eep_slave_addr.get(), 16), eep_addr, 259)
+            read_list, result = self.i2c_tab.sub20_i2c_read(int(self.eep.v.slave_addr.get(), 16), eep_addr, 259)
             time.sleep(0.1)
             try:
                 len(read_list)
@@ -493,7 +506,7 @@ class EEPROMTab:
             eep_addr = eep_addr + page_len + 4
             n += 1
 
-            if crc != int(self.eep.v.eep_crc_ofs.get(), 16):
+            if crc != int(self.eep.v.crc_ofs.get(), 16):
                 return
 
     def eep_read_save(self):
@@ -503,7 +516,7 @@ class EEPROMTab:
         eep_pages = []
         eep_addr = 0
         while True:
-            read_list, result = self.i2c_tab.sub20_i2c_read(int(self.eep.v.eep_slave_addr.get(), 16), eep_addr, 259)
+            read_list, result = self.i2c_tab.sub20_i2c_read(int(self.eep.v.slave_addr.get(), 16), eep_addr, 259)
             time.sleep(0.1)
             try:
                 len(read_list)
@@ -517,14 +530,14 @@ class EEPROMTab:
             for b in range(page_len + 1 + 3):
                 crc = (crc + ord(read_list[b])) % 256
 
-            if crc != int(self.eep.v.eep_crc_ofs.get(), 16):
+            if crc != int(self.eep.v.crc_ofs.get(), 16):
                 read_num = eep_addr
                 break
 
             eep_pages.append(f"{page_id:02X}")
             eep_addr = eep_addr + page_len + 4
 
-        read_list, result = self.i2c_tab.sub20_i2c_read(int(self.eep.v.eep_slave_addr.get(), 16), int("".join(self.eep.v.eep_access_addr.get().split()), 16), read_num)
+        read_list, result = self.i2c_tab.sub20_i2c_read(int(self.eep.v.slave_addr.get(), 16), int("".join(self.eep.v.access_addr.get().split()), 16), read_num)
         time.sleep(0.1)
         try:
             len(read_list)
@@ -555,12 +568,12 @@ class EEPROMTab:
 
     # Write
     def eep_write(self):
-        write_str = self.eep.v.eep_write.get()
+        write_str = self.eep.v.write.get()
         n = len(write_str.split())
         byte_list = create_string_buffer(n)
         byte_list[0:n] = bytearray().fromhex(write_str)
 
-        self.eep_32bytes_write(int(self.eep.v.eep_slave_addr.get(), 16), int("".join(self.eep.v.eep_access_addr.get().split()), 16), byte_list)
+        self.eep_32bytes_write(int(self.eep.v.slave_addr.get(), 16), int("".join(self.eep.v.access_addr.get().split()), 16), byte_list)
 
     def eep_pg_write(self, pg_hex):
         if len(self.spl.pages_unique) == 0:
@@ -581,15 +594,15 @@ class EEPROMTab:
         sum = 0
         n = self.tst.l.wo_cnt[pg_idx] + 1
         byte_list = create_string_buffer(1)
-        eep_addr = int("".join(self.eep.v.eep_access_addr.get().split()), 16)
+        eep_addr = int("".join(self.eep.v.access_addr.get().split()), 16)
         byte_list[0:1] = bytearray().fromhex(pg_hex)
-        sub_errno, result = self.i2c_tab.sub20_i2c_write(int(self.eep.v.eep_slave_addr.get(), 16), eep_addr, byte_list)
+        sub_errno, result = self.i2c_tab.sub20_i2c_write(int(self.eep.v.slave_addr.get(), 16), eep_addr, byte_list)
         sum += pg_dec
         if sub_errno != 0:
             messagebox.showerror("EEPROM Write Result", "Write Failed!\n" + result)
 
         byte_list[0:1] = bytearray().fromhex(f"{(n - 1):02X}")
-        sub_errno, result = self.i2c_tab.sub20_i2c_write(int(self.eep.v.eep_slave_addr.get(), 16), eep_addr + 1, byte_list)
+        sub_errno, result = self.i2c_tab.sub20_i2c_write(int(self.eep.v.slave_addr.get(), 16), eep_addr + 1, byte_list)
         sum += n - 1
         if sub_errno != 0:
             messagebox.showerror("EEPROM Write Result", "Write Failed!\n" + result)
@@ -603,7 +616,7 @@ class EEPROMTab:
 
             byte_list = create_string_buffer(nn)
             byte_list[0:nn] = bytearray().fromhex(" ".join([x.zfill(2).upper() for x in [self.adr.hexa_per_pg_mod[pg_idx][i].replace("-", "00") for i in range(n1, n1 + nn)]]))
-            sub_errno, result = self.i2c_tab.sub20_i2c_write(int(self.eep.v.eep_slave_addr.get(), 16), eep_addr + 2 + n1, byte_list)
+            sub_errno, result = self.i2c_tab.sub20_i2c_write(int(self.eep.v.slave_addr.get(), 16), eep_addr + 2 + n1, byte_list)
             for hex in [self.adr.hexa_per_pg_mod[pg_idx][i].replace("-", "00") for i in range(n1, n1 + nn)]:
                 sum += int(hex, 16)
             if sub_errno != 0:
@@ -616,36 +629,36 @@ class EEPROMTab:
             n1 = n1 + nn
             eep_addr_mod32 = 0
 
-        crc = (int(self.eep.v.eep_crc_ofs.get(), 16) + 256 - sum) % 256
+        crc = (int(self.eep.v.crc_ofs.get(), 16) + 256 - sum) % 256
         byte_list = create_string_buffer(1)
         byte_list[0] = bytearray().fromhex(f"{crc:02X}")
-        sub_errno, result = self.i2c_tab.sub20_i2c_write(int(self.eep.v.eep_slave_addr.get(), 16), last, byte_list)
+        sub_errno, result = self.i2c_tab.sub20_i2c_write(int(self.eep.v.slave_addr.get(), 16), last, byte_list)
         if sub_errno != 0:
             messagebox.showerror("EEPROM Write Result", "Write Failed!\n" + result)
 
     def eep_write_1_pg(self):
-        if re.compile(r"[^0-9a-fA-F]").search(self.eep.v.eep_write_1.get()) is not None:
+        if re.compile(r"[^0-9a-fA-F]").search(self.eep.v.write_1.get()) is not None:
             messagebox.showerror("INPUT ERROR", "Invalid Input Format")
             return
 
-        pg_hex = self.eep.v.eep_write_1.get().upper()
+        pg_hex = self.eep.v.write_1.get().upper()
         self.eep_pg_write(pg_hex)
 
     def eep_write_listed_pg(self):
-        if re.compile(r"[^0-9a-fA-F ]").search(self.eep.v.eep_write_list.get()) is not None:
+        if re.compile(r"[^0-9a-fA-F ]").search(self.eep.v.write_list.get()) is not None:
             messagebox.showerror("INPUT ERROR", "Invalid Input Format")
             return
 
-        pg_hexa = self.eep.v.eep_write_list.get().upper().split()
+        pg_hexa = self.eep.v.write_list.get().upper().split()
         for pg_hex in pg_hexa:
             self.eep_pg_write(pg_hex)
 
     def eep_write_mod_pg(self):
-        if re.compile(r"[^0-9a-fA-F ]").search(self.eep.v.eep_check_mod.get()) is not None:
+        if re.compile(r"[^0-9a-fA-F ]").search(self.eep.v.check_mod.get()) is not None:
             messagebox.showerror("INPUT ERROR", "Invalid Input Format")
             return
 
-        pg_hexa = self.eep.v.eep_check_mod.get().upper().split()
+        pg_hexa = self.eep.v.check_mod.get().upper().split()
         for pg_hex in pg_hexa:
             self.eep_pg_write(pg_hex)
 
@@ -656,7 +669,7 @@ class EEPROMTab:
         byte_list = create_string_buffer(n)
         byte_list[0:n] = bytearray().fromhex(" ".join(byte_text))
 
-        self.eep_32bytes_write(int(self.eep.v.eep_slave_addr.get(), 16), int("".join(self.eep.v.eep_access_addr.get().split()), 16), byte_list)
+        self.eep_32bytes_write(int(self.eep.v.slave_addr.get(), 16), int("".join(self.eep.v.access_addr.get().split()), 16), byte_list)
 
     def eep_32bytes_write(self, slv_addr, mem_addr, byte_list):
         eep_addr_mod32 = mem_addr % 32
@@ -695,16 +708,16 @@ class EEPROMTab:
             else:
                 time.sleep(0.2 * n_busy)
 
-        self.tkst_r_read.delete("1.0", END)
-        self.tkst_r_read.insert("1.0", "-")
-        self.tkst_w_read.delete("1.0", END)
-        self.tkst_w_read.insert("1.0", "-")
+        self.p.tkst_write(self.tkst_r_read, delete=True)
+        self.p.tkst_write(self.tkst_r_read, text="-")
+        self.p.tkst_write(self.tkst_w_read, delete=True)
+        self.p.tkst_write(self.tkst_w_read, text="-")
 
     # Export - Text File Tab
     def import_rom(self):
         byte_text = self.open_file()
-        self.eep.v.eep_import_rom.set("")
-        self.eep.v.eep_txtfile[0].set("")
+        self.eep.v.import_rom.set("")
+        self.eep.v.txtfile[0].set("")
         self.eep.d.eep_imp_pg = {}
 
         if len(byte_text) == 0:
@@ -718,55 +731,55 @@ class EEPROMTab:
             self.eep.d.eep_imp_pg[byte_text[k]] = " ".join(byte_text[k + 1:k + n])
             k += n
 
-        self.eep.v.eep_import_rom.set(" ".join(sorted([x.zfill(2) for x in mod_page_list])))
-        self.eep.v.eep_txtfile[0].set("Imported: " + self.txtfilename)
+        self.eep.v.import_rom.set(" ".join(sorted([x.zfill(2) for x in mod_page_list])))
+        self.eep.v.txtfile[0].set("Imported: " + self.txtfilename)
 
         self.exp_imported.grid(row=6, column=2, columnspan=2, sticky=E)
 
     def remove_dup_mod(self):
-        mod_list = self.eep.v.eep_check_mod.get().split()
-        imp_list = self.eep.v.eep_import_rom.get().split()
+        mod_list = self.eep.v.check_mod.get().split()
+        imp_list = self.eep.v.import_rom.get().split()
         mod_list = sorted(list(set(mod_list) - set(imp_list)))
-        self.eep.v.eep_check_mod.set(" ".join(mod_list))
+        self.eep.v.check_mod.set(" ".join(mod_list))
 
     def remove_dup_imp(self):
-        mod_list = self.eep.v.eep_check_mod.get().split()
-        imp_list = self.eep.v.eep_import_rom.get().split()
+        mod_list = self.eep.v.check_mod.get().split()
+        imp_list = self.eep.v.import_rom.get().split()
         imp_list = sorted(list(set(imp_list) - set(mod_list)))
-        self.eep.v.eep_import_rom.set(" ".join(imp_list))
+        self.eep.v.import_rom.set(" ".join(imp_list))
 
     def concatenate(self):
-        mod_list = self.eep.v.eep_check_mod.get().split()
-        imp_list = self.eep.v.eep_import_rom.get().split()
+        mod_list = self.eep.v.check_mod.get().split()
+        imp_list = self.eep.v.import_rom.get().split()
         c = [""]
         exp_list = sorted(list((set(mod_list) | set(imp_list)) - set(c)))
-        self.eep.v.eep_conc.set(" ".join(exp_list))
+        self.eep.v.conc.set(" ".join(exp_list))
 
     def export_common(self):
-        priority0 = self.eep.v.eep_pri_main.get().split()
-        priority1 = self.eep.v.eep_pri_core.get().split()
-        priority2 = self.eep.v.eep_pri_base.get().split()
+        priority0 = self.eep.v.pri_main.get().split()
+        priority1 = self.eep.v.pri_core.get().split()
+        priority2 = self.eep.v.pri_base.get().split()
 
-        self.eep.v.eep_txt_main.set("")
-        self.eep.v.eep_txt_base.set("")
-        self.eep.v.eep_txt_core.set("")
-        self.eep_txt_full.delete("1.0", END)
-        self.eep_txt_full.insert("1.0", "-")
+        self.eep.v.txt_main.set("")
+        self.eep.v.txt_base.set("")
+        self.eep.v.txt_core.set("")
+        self.p.tkst_write(self.eep_txt_full, delete=True)
+        self.p.tkst_write(self.eep_txt_full, text="-")
 
-        if self.eep.v.eep_conc.get() == "":
+        if self.eep.v.conc.get() == "":
             return
 
-        export_list = self.eep.v.eep_conc.get().split()
-        import_list = self.eep.v.eep_import_rom.get().split()
-        if self.eep.v.eep_check.get() == 1:
-            export_list.extend(self.eep.v.eep_pri_main.get().split())
-            export_list.extend(self.eep.v.eep_pri_core.get().split())
-            export_list.extend(self.eep.v.eep_pri_base.get().split())
+        export_list = self.eep.v.conc.get().split()
+        import_list = self.eep.v.import_rom.get().split()
+        if self.eep.v.check.get() == 1:
+            export_list.extend(self.eep.v.pri_main.get().split())
+            export_list.extend(self.eep.v.pri_core.get().split())
+            export_list.extend(self.eep.v.pri_base.get().split())
             export_list = sorted(list(set(export_list)))
 
         if len(self.eep.d.eep_imp_pg) == 0:
             sort_list = export_list.copy()
-            for main in list(reversed(self.eep.v.eep_pri_main.get().split())):
+            for main in list(reversed(self.eep.v.pri_main.get().split())):
                 if main in sort_list:
                     sort_list.insert(0, sort_list.pop(sort_list.index(main)))
 
@@ -790,7 +803,7 @@ class EEPROMTab:
                     byte_list.append(byte_hex)
                     sumcheck = (sumcheck + int(byte_hex, 16)) % 256
 
-                crc = (int(self.eep.v.eep_crc_ofs.get(), 16) + 256 - sumcheck) % 256
+                crc = (int(self.eep.v.crc_ofs.get(), 16) + 256 - sumcheck) % 256
                 byte_list.append(f"{crc:02X}")
 
             root_list = []
@@ -815,32 +828,32 @@ class EEPROMTab:
             page_list3 = []
 
             if len(root_list) > 0:
-                self.set_hex("cfg_eeprom_total", f"{(1 + len(core_list) + len(base_list) + len(full_list)):X}")
-                self.set_hex("cfg_eeprom_base", f"{(1 + len(core_list) + len(base_list)):X}")
-                self.set_hex("cfg_eeprom_core", f"{(1 + len(core_list)):X}")
+                self.p.set_val_by_name("cfg_eeprom_total", "#4", f"{(1 + len(core_list) + len(base_list) + len(full_list)):X}")
+                self.p.set_val_by_name("cfg_eeprom_base", "#4", f"{(1 + len(core_list) + len(base_list)):X}")
+                self.p.set_val_by_name("cfg_eeprom_core", "#4", f"{(1 + len(core_list)):X}")
                 page_list1.append(root_list[0])
-                self.eep.v.eep_txt_main.set(" ".join(root_list))
+                self.eep.v.txt_main.set(" ".join(root_list))
 
             if len(core_list) > 0:
                 for page in core_list:
                     page_list1.append(page)
-                page_list1 = list(set(page_list1) - set(self.eep.v.eep_pri_main.get().split()))
+                page_list1 = list(set(page_list1) - set(self.eep.v.pri_main.get().split()))
 
             if len(base_list) > 0:
                 for page in base_list:
                     page_list2.append(page)
-                page_list2 = list(set(page_list2) - set(self.eep.v.eep_pri_main.get().split()))
+                page_list2 = list(set(page_list2) - set(self.eep.v.pri_main.get().split()))
 
             if len(full_list) > 0:
                 for page in full_list:
                     page_list3.append(page)
-                page_list3 = list(set(page_list3) - set(self.eep.v.eep_pri_main.get().split()))
+                page_list3 = list(set(page_list3) - set(self.eep.v.pri_main.get().split()))
 
-            self.eep.v.eep_txt_core.set(" ".join(sorted(page_list1)))
-            self.eep.v.eep_txt_base.set(" ".join(sorted(page_list2)))
+            self.eep.v.txt_core.set(" ".join(sorted(page_list1)))
+            self.eep.v.txt_base.set(" ".join(sorted(page_list2)))
             priority3 = " ".join(sorted(page_list3))
-            self.eep_txt_full.delete("1.0", END)
-            self.eep_txt_full.insert("1.0", priority3)
+            self.p.tkst_write(self.eep_txt_full, delete=True)
+            self.p.tkst_write(self.eep_txt_full, text=priority3)
 
             return byte_list
 
@@ -867,12 +880,12 @@ class EEPROMTab:
         page_list3= []
 
         if len(root_list) > 0:
-            self.set_hex("cfg_eeprom_total", f"{(1 + len(core_list) + len(base_list) + len(full_list)):X}")
-            self.set_hex("cfg_eeprom_base", f"{(1 + len(core_list) + len(base_list)):X}")
-            self.set_hex("cfg_eeprom_core", f"{(1 + len(core_list)):X}")
+            self.p.set_val_by_name("cfg_eeprom_total", "#4", f"{(1 + len(core_list) + len(base_list) + len(full_list)):X}")
+            self.p.set_val_by_name("cfg_eeprom_base", "#4", f"{(1 + len(core_list) + len(base_list)):X}")
+            self.p.set_val_by_name("cfg_eeprom_core", "#4", f"{(1 + len(core_list)):X}")
             byte_list.extend(self.generate_page(root_list[0]))
             page_list1.append(root_list[0])
-            self.eep.v.eep_txt_main.set(" ".join(root_list))
+            self.eep.v.txt_main.set(" ".join(root_list))
 
         if len(core_list) > 0:
             for page in core_list:
@@ -881,7 +894,7 @@ class EEPROMTab:
                     byte_list.extend(self.page_reload(page))
                 else:
                     byte_list.extend(self.generate_page(page))
-            page_list1 = list(set(page_list1) - set(self.eep.v.eep_pri_main.get().split()))
+            page_list1 = list(set(page_list1) - set(self.eep.v.pri_main.get().split()))
 
         if len(base_list) > 0:
             for page in base_list:
@@ -890,7 +903,7 @@ class EEPROMTab:
                     byte_list.extend(self.page_reload(page))
                 else:
                     byte_list.extend(self.generate_page(page))
-            page_list2 = list(set(page_list2) - set(self.eep.v.eep_pri_main.get().split()))
+            page_list2 = list(set(page_list2) - set(self.eep.v.pri_main.get().split()))
 
         if len(full_list) > 0:
             for page in full_list:
@@ -899,13 +912,13 @@ class EEPROMTab:
                     byte_list.extend(self.page_reload(page))
                 else:
                     byte_list.extend(self.generate_page(page))
-            page_list3 = list(set(page_list3) - set(self.eep.v.eep_pri_main.get().split()))
+            page_list3 = list(set(page_list3) - set(self.eep.v.pri_main.get().split()))
 
-        self.eep.v.eep_txt_core.set(" ".join(sorted(page_list1)))
-        self.eep.v.eep_txt_base.set(" ".join(sorted(page_list2)))
+        self.eep.v.txt_core.set(" ".join(sorted(page_list1)))
+        self.eep.v.txt_base.set(" ".join(sorted(page_list2)))
         priority3 = " ".join(sorted(page_list3))
-        self.eep_txt_full.delete("1.0", END)
-        self.eep_txt_full.insert("1.0", priority3)
+        self.p.tkst_write(self.eep_txt_full, delete=True)
+        self.p.tkst_write(self.eep_txt_full, text=priority3)
 
         return byte_list
 
@@ -954,20 +967,6 @@ class EEPROMTab:
         txt.write(text)
         txt.close()
 
-    def set_hex(self, regname, modvalue):
-        idx = self.mer.names.index(regname)
-
-        if len(f"{int(modvalue, 16):b}") > len(self.mer.bina[idx]):
-            modvalue = f"{int('1' * len(self.mer.bina[idx]), 2):X}"
-        if modvalue.zfill(len(self.mer.hexa[idx])) == self.mer.hexa[idx]:
-            return
-
-        bin_bit = len(self.mer.widths[idx])
-        hex_bit = int(ceil(bin_bit / 4))
-        hex = modvalue.zfill(hex_bit)
-
-        self.reg_tab.modify0("#4", str(idx), regname, self.reg_tab.name_tree.item(str(idx), "value"), hex)
-
     def generate_page(self, pg_hex):
         byte_list = []
         pg_dec = int(pg_hex, 16)
@@ -987,7 +986,7 @@ class EEPROMTab:
         byte_list.append(f"{pg_wo:02X}")
 
         for k in range(pg_wo + 1):
-            if (pg_hex in self.eep.v.eep_check_mod.get().split()) & (pg_hex not in self.eep.v.eep_import_rom.get().split()):
+            if (pg_hex in self.eep.v.check_mod.get().split()) & (pg_hex not in self.eep.v.import_rom.get().split()):
                 if pg_hex.upper() == "ED":
                     if self.ed_hid1_tree.tag_has("modified", "237-" + str(k)) | self.ed_hid1_tree.tag_has("eeprom", "237-" + str(k)) | self.ed_hid1_tree.tag_has("edid", "237-" + str(k)):
                         byte_hex = self.ed_hid1_tree.item(str(pg_dec) + "-" + str(k), "value")[1]
@@ -1013,7 +1012,7 @@ class EEPROMTab:
             byte_list.append(byte_hex)
             sumcheck = (sumcheck + byte_dec) % 256
 
-        crc = (int(self.eep.v.eep_crc_ofs.get(), 16) + 256 - sumcheck) % 256
+        crc = (int(self.eep.v.crc_ofs.get(), 16) + 256 - sumcheck) % 256
         byte_list.append(f"{crc:02X}")
 
         return byte_list
@@ -1031,10 +1030,10 @@ class EEPROMTab:
 
         byte_text = self.open_file()
 
-        if self.txtfilename == self.eep.v.eep_txtfile[1].get()[10:]:
+        if self.txtfilename == self.eep.v.txtfile[1].get()[10:]:
             return
 
-        self.eep.v.eep_txtfile[1].set("")
+        self.eep.v.txtfile[1].set("")
 
         if len(byte_text) == 0:
             return
@@ -1066,7 +1065,7 @@ class EEPROMTab:
             if len(set(self.imp_tree.get_children(pg)) - set(self.imp_tree.tag_has("gray"))) == 0:
                 self.imp_tree.item(pg, tag="gray")
 
-        self.eep.v.eep_txtfile[1].set("Imported: " + self.txtfilename)
+        self.eep.v.txtfile[1].set("Imported: " + self.txtfilename)
 
     def check(self, event):
         col = self.imp_tree.identify_column(event.x)
@@ -1143,9 +1142,9 @@ class EEPROMTab:
                 self.ed_modify1(pg + " " + self.adr.num_range[pg_idx][int(num) // 16], pg, int(num), new_val, mod_tag="eeprom")
             cnt += 1
 
-        if (self.eep.v.eep_txtfile[1].get()[10:] not in self.reg.l.xlsx_list) & (cnt != 0):
-            self.eep.l.imported_txt.append(self.eep.v.eep_txtfile[1].get()[10:])
-            self.reg.l.xlsx_list.append(self.eep.v.eep_txtfile[1].get()[10:])
+        if (self.eep.v.txtfile[1].get()[10:] not in self.reg.l.xlsx_list) & (cnt != 0):
+            self.eep.l.imported_txt.append(self.eep.v.txtfile[1].get()[10:])
+            self.reg.l.xlsx_list.append(self.eep.v.txtfile[1].get()[10:])
             self.reg.v.xlsx_names.set("\n".join(self.reg.l.xlsx_list))
 
         if len(not_exist) > 0:
@@ -1172,7 +1171,7 @@ class EEPROMTab:
 
     def reset_eep(self):
         self.imp_tree.delete(*self.imp_tree.get_children())
-        self.eep.v.eep_txtfile[1].set("")
+        self.eep.v.txtfile[1].set("")
     
     def show_hide(self, choice):
         if choice.lower() == "name":
@@ -1638,7 +1637,7 @@ class EEPROMTab:
         if (col == "#5") & (val[4] != ""):
             messagebox.showinfo(name, self.mer.desc[int(row)])
 
-    def ed_modify0(self, col, row, name, val, new):
+    def ed_modify0(self, col, row, name, val, new, mod_tag="modified"):
         if col == "#2":
             if val[1] == new.zfill(len(self.mer.bina[int(row)])):
                 return
@@ -1662,21 +1661,21 @@ class EEPROMTab:
         self.ed_name_tree.set(row, column="#3", value=self.mer.deci_mod[int(row)])
         self.ed_name_tree.set(row, column="#4", value=self.mer.hexa_mod[int(row)])
 
-        self.ed_name_tree.item(row, tag="modified")
+        self.ed_name_tree.item(row, tag=mod_tag)
 
-        self.ed_mod0_mg2sp(row, name)
-        self.ed_mod0_sp2ad(name)
+        self.ed_mod0_mg2sp(row, name, mod_tag)
+        self.ed_mod0_sp2ad(name, mod_tag)
         self.ed_modified()
         self.ed_bin_over_20b(mod=True)
 
-    def ed_mod0_mg2sp(self, row, name):
+    def ed_mod0_mg2sp(self, row, name, mod_tag):
         spl_iid = []
         if self.spl.names_wo_width.count(name) == 1:
             spl_iid.append(int(row))
             self.spl.bina_mod[int(row)] = self.mer.bina_mod[int(row)]
             self.spl.deci_mod[int(row)] = int(self.spl.bina_mod[int(row)], 2)
             self.spl.hexa_mod[int(row)] = f"{int(self.spl.bina_mod[int(row)], 2):X}".zfill(len(self.spl.hexa_mod[int(row)]))
-            self.ed_hid0_tree.item(row + "-split", tag="modified")
+            self.ed_hid0_tree.item(row + "-split", tag=mod_tag)
         elif self.spl.names_wo_width.count(name) > 1:
             for (i, item) in list(enumerate(self.spl.names_wo_width)):
                 if name == item:
@@ -1688,14 +1687,14 @@ class EEPROMTab:
                         self.spl.bina_mod[i] = self.mer.bina_mod[int(row)][len(self.mer.bina_mod[int(row)]) - 1 - int(self.spl.widths[i])]
                     self.spl.deci_mod[i] = int(self.spl.bina_mod[i], 2)
                     self.spl.hexa_mod[i] = f"{int(self.spl.bina_mod[i], 2):X}".zfill(len(self.spl.hexa_mod[i]))
-                    self.ed_hid0_tree.item(str(i) + "-split", tag="modified")
+                    self.ed_hid0_tree.item(str(i) + "-split", tag=mod_tag)
 
         for iid in spl_iid:
             self.ed_hid0_tree.set(str(iid) + "-split", column="#2", value=self.spl.bina_mod[iid])
             self.ed_hid0_tree.set(str(iid) + "-split", column="#3", value=self.spl.deci_mod[iid])
             self.ed_hid0_tree.set(str(iid) + "-split", column="#4", value=self.spl.hexa_mod[iid])
 
-    def ed_mod0_sp2ad(self, name):
+    def ed_mod0_sp2ad(self, name, mod_tag):
         adr_iid = []
         for (i, item) in list(enumerate(self.spl.names_wo_width)):
             if name == item:
@@ -1708,15 +1707,15 @@ class EEPROMTab:
                         self.adr.bina_mod[self.adr.pg_and_num.index(page_num)] = self.p.replace_text(int(bit.split(":")[1]), int(bit.split(":")[0]), self.spl.bina_mod[i], text=self.adr.bina_mod[self.adr.pg_and_num.index(page_num)])
                         self.adr.hexa_mod[self.adr.pg_and_num.index(page_num)] = f"{int(self.adr.bina_mod[self.adr.pg_and_num.index(page_num)], 2):02X}"
                         self.adr.hexa_per_pg_mod[self.spl.pages_unique.index(int(page))][int(num)] = self.adr.hexa_mod[self.adr.pg_and_num.index(page_num)]
-                        self.ed_hid1_tree.item(page_num, tag="modified")
-                        self.ed_addr_tree.item((page + " " + self.adr.num_range[self.spl.pages_unique.index(int(page))][int(num) // 16]), tag="modified")
+                        self.ed_hid1_tree.item(page_num, tag=mod_tag)
+                        self.ed_addr_tree.item((page + " " + self.adr.num_range[self.spl.pages_unique.index(int(page))][int(num) // 16]), tag=mod_tag)
                 elif ":" not in bit:
                     if self.adr.bina_mod[self.adr.pg_and_num.index(page_num)] != self.p.replace_text(int(bit), None, self.spl.bina_mod[i], text=self.adr.bina_mod[self.adr.pg_and_num.index(page_num)]):
                         self.adr.bina_mod[self.adr.pg_and_num.index(page_num)] = self.p.replace_text(int(bit), None, self.spl.bina_mod[i], text=self.adr.bina_mod[self.adr.pg_and_num.index(page_num)])
                         self.adr.hexa_mod[self.adr.pg_and_num.index(page_num)] = f"{int(self.adr.bina_mod[self.adr.pg_and_num.index(page_num)], 2):02X}"
                         self.adr.hexa_per_pg_mod[self.spl.pages_unique.index(int(page))][int(num)] = self.adr.hexa_mod[self.adr.pg_and_num.index(page_num)]
-                        self.ed_hid1_tree.item(page_num, tag="modified")
-                        self.ed_addr_tree.item((page + " " + self.adr.num_range[self.spl.pages_unique.index(int(page))][int(num) // 16]), tag="modified")
+                        self.ed_hid1_tree.item(page_num, tag=mod_tag)
+                        self.ed_addr_tree.item((page + " " + self.adr.num_range[self.spl.pages_unique.index(int(page))][int(num) // 16]), tag=mod_tag)
 
         for iid in adr_iid:
             self.ed_hid1_tree.set(iid, column="#1", value=self.adr.bina_mod[self.adr.pg_and_num.index(iid)])
@@ -1990,8 +1989,13 @@ class EEPROMTab:
             self.reg.v.xlsx_names.set("\n".join(self.reg.l.xlsx_list))
 
         self.ed_bin_over_20b()
+        self.p.check_mod()
 
     def ed_modified(self):
         if len(self.ed_name_tree.tag_has("modified") + self.ed_name_tree.tag_has("eeprom") + self.ed_name_tree.tag_has("edid")) != 0:
             if "237" not in self.reg.l.modified_pg:
                 self.reg.l.modified_pg.append("237")
+
+    # etc
+    def resize(self, event):
+        self.data_cv.configure(scrollregion=self.data_cv.bbox(ALL))

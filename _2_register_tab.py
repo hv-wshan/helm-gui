@@ -76,7 +76,7 @@ class RegisterTab:
         ttk.Button(name_ctrl_frm, text="Import Modified Byte List", width=23, command=self.p.imp_byte).pack(side=TOP, anchor=CENTER, pady=(0, 3), ipadx=3)
         ttk.Button(name_ctrl_frm, text="Export Modified Byte List", width=23, command=self.p.exp_byte).pack(side=TOP, anchor=CENTER, pady=(0, 13), ipadx=3)
         ttk.Button(name_ctrl_frm, text="Check Modified Pages", width=23, command=self.p.check_mod).pack(side=TOP, anchor=CENTER, pady=(0, 3), ipadx=3)
-        ttk.Entry(name_ctrl_frm, textvariable=self.eep.v.eep_check_mod, width=23, state="readonly").pack(side=TOP, anchor=CENTER, ipadx=4)
+        ttk.Entry(name_ctrl_frm, textvariable=self.eep.v.check_mod, width=23, state="readonly").pack(side=TOP, anchor=CENTER, ipadx=4)
         ttk.Label(name_ctrl_frm, text="\n").pack(side=TOP, fill=X)
         ttk.Checkbutton(name_ctrl_frm, text="Show hidden tab", variable=self.reg.v.check0, command=lambda choice="name": self.show_hide(choice)).pack(side=TOP)
 
@@ -115,7 +115,7 @@ class RegisterTab:
         ttk.Button(addr_ctrl_frm, text="Import Modified Byte List", width=23, command=self.p.imp_byte).pack(side=TOP, anchor=CENTER, pady=(0, 3), ipadx=3)
         ttk.Button(addr_ctrl_frm, text="Export Modified Byte List", width=23, command=self.p.exp_byte).pack(side=TOP, anchor=CENTER, pady=(0, 13), ipadx=3)
         ttk.Button(addr_ctrl_frm, text="Check Modified Pages", width=23, command=self.p.check_mod).pack(side=TOP, anchor=CENTER, pady=(0, 3), ipadx=3)
-        ttk.Entry(addr_ctrl_frm, textvariable=self.eep.v.eep_check_mod, width=23, state="readonly").pack(side=TOP, anchor=CENTER, ipadx=4)
+        ttk.Entry(addr_ctrl_frm, textvariable=self.eep.v.check_mod, width=23, state="readonly").pack(side=TOP, anchor=CENTER, ipadx=4)
         ttk.Label(addr_ctrl_frm, text="\n").pack(side=TOP, fill=X)
         ttk.Checkbutton(addr_ctrl_frm, text="Show hidden tab", variable=self.reg.v.check1, command=lambda choice="addr": self.show_hide(choice)).pack(side=TOP)
 
@@ -211,83 +211,83 @@ class RegisterTab:
             if ws[page].value == "end":
                 break
 
-            self.spl.pages.append(ws[page].value)
-            self.spl.groups.append(ws[grp].value)
-            self.spl.names_w_width.append(ws[name].value)
-            self.spl.addr_raw.append(ws[addr].value)
-            self.spl.addr_total.append(str(ws[page].value) + "-" + ws[addr].value)
-            self.spl.defaults.append(ws[default].value)
-            self.spl.desc.append(ws[desc].value)
-            self.spl.merge_check.append(ws[merge].value)
-            self.spl.ronly_check.append(ws[ronly].value)
+            self.spl.l.pages.append(ws[page].value)
+            self.spl.l.groups.append(ws[grp].value)
+            self.spl.l.names_w_width.append(ws[name].value)
+            self.spl.l.addr_raw.append(ws[addr].value)
+            self.spl.l.addr_total.append(str(ws[page].value) + "-" + ws[addr].value)
+            self.spl.l.defaults.append(ws[default].value)
+            self.spl.l.desc.append(ws[desc].value)
+            self.spl.l.merge_check.append(ws[merge].value)
+            self.spl.l.ronly_check.append(ws[ronly].value)
 
-        for item in self.spl.pages:
-            if item not in self.spl.pages_unique:
-                self.spl.pages_unique.append(item)
+        for item in self.spl.l.pages:
+            if item not in self.spl.l.pages_unique:
+                self.spl.l.pages_unique.append(item)
 
-        for item in self.spl.groups:
-            if item not in self.spl.groups_unique:
-                self.spl.groups_unique.append(item)
+        for item in self.spl.l.groups:
+            if item not in self.spl.l.groups_unique:
+                self.spl.l.groups_unique.append(item)
 
-        self.spl.names_wo_width = []
-        self.spl.widths = []
-        for item in self.spl.names_w_width:
+        self.spl.l.names_wo_width = []
+        self.spl.l.widths = []
+        for item in self.spl.l.names_w_width:
             if "[" not in item:
                 raw_name = item
                 width = "-"
             elif "[" in item:
                 raw_name, width = item.split("[")
                 width = width.strip("]")
-            self.spl.names_wo_width.append(raw_name)
-            self.spl.widths.append(width)
+            self.spl.l.names_wo_width.append(raw_name)
+            self.spl.l.widths.append(width)
 
         for i in range(len(self.spl.l.addr_num), len(self.spl.l.addr_raw)):
             addr0, addr1 = self.spl.l.addr_raw[i].strip(")").split("(")
-            self.spl.addr_num.append(addr0)
-            self.spl.addr_bit.append(addr1)
+            self.spl.l.addr_num.append(addr0)
+            self.spl.l.addr_bit.append(addr1)
 
-        self.spl.bina = []
-        for (i, item) in list(enumerate(self.spl.defaults)):
+        self.spl.l.bina = []
+        for (i, item) in list(enumerate(self.spl.l.defaults)):
             if item[0] == "b":
                 bin = item.replace("b", "")
             elif ("R" not in item) & (item[0] != "b"):
                 bin = item
-                print("[Warning - Excel Reading] Wrong Default Format: " + self.spl.names_w_width[i] + ", " + item + " (row " + str(i + 2) + ", column E)")
+                print("[Warning - Excel Reading] Wrong Default Format: " + self.spl.l.names_w_width[i] + ", " + item + " (row " + str(i + 2) + ", column E)")
             else:
                 bin = "-"
-            self.spl.bina.append(bin)
+            self.spl.l.bina.append(bin)
 
-        self.spl.desc_icon = []
-        for item in self.spl.desc:
+        self.spl.l.desc_icon = []
+        for item in self.spl.l.desc:
             if item is None:
                 desc_icon = ""
             else:
                 desc_icon = "ⓘ"
-            self.spl.desc_icon.append(desc_icon)
+            self.spl.l.desc_icon.append(desc_icon)
 
-        self.spl.r_icon = []
-        for item in self.spl.ronly_check:
+        self.spl.l.r_icon = []
+        for item in self.spl.l.ronly_check:
             if item is None:
                 r_icon = ""
             else:
                 r_icon = "®"
-            self.spl.r_icon.append(r_icon)
+            self.spl.l.r_icon.append(r_icon)
 
         self.merge()
         self.bin_to_dec()
         self.dec_to_hex()
 
-        self.spl.bina_mod = self.spl.bina.copy()
-        self.mer.bina_mod = self.mer.bina.copy()
-        self.spl.deci_mod = self.spl.deci.copy()
-        self.mer.deci_mod = self.mer.deci.copy()
-        self.spl.hexa_mod = self.spl.hexa.copy()
-        self.mer.hexa_mod = self.mer.hexa.copy()
+        self.spl.l.bina_mod = self.spl.l.bina.copy()
+        self.mer.l.bina_mod = self.mer.l.bina.copy()
+        self.spl.l.deci_mod = self.spl.l.deci.copy()
+        self.mer.l.deci_mod = self.mer.l.deci.copy()
+        self.spl.l.hexa_mod = self.spl.l.hexa.copy()
+        self.mer.l.hexa_mod = self.mer.l.hexa.copy()
 
         self.name_to_addr()
-        self.adr.bina_mod = self.adr.bina.copy()
-        self.adr.hexa_mod = self.adr.hexa.copy()
-        self.adr.hexa_per_pg_mod = deepcopy(self.adr.hexa_per_pg)
+        self.adr.l.bina_mod = self.adr.l.bina.copy()
+        self.adr.l.hexa_mod = self.adr.l.hexa.copy()
+        self.adr.l.hexa_per_pg_mod = deepcopy(self.adr.l.hexa_per_pg)
 
     def reg_add_treeview(self):
         self.name_tree.delete(*self.name_tree.get_children())
@@ -295,51 +295,51 @@ class RegisterTab:
         self.hid0_tree.delete(*self.hid0_tree.get_children())
         self.hid1_tree.delete(*self.hid1_tree.get_children())
 
-        for (i, ancestor) in list(enumerate(self.spl.groups_unique)):
+        for (i, ancestor) in list(enumerate(self.spl.l.groups_unique)):
             if ancestor != "EDID":
                 self.name_tree.insert("", i, iid=ancestor, text=ancestor)
-        for (i, item) in list(enumerate(self.spl.groups)):
+        for (i, item) in list(enumerate(self.spl.l.groups)):
             try:
-                condition = (self.mer.l.names[i] != "MERGED") & (i < self.spl.groups.index("EDID"))
+                condition = (self.mer.l.names[i] != "MERGED") & (i < self.spl.l.groups.index("EDID"))
             except ValueError:
                 condition = self.mer.l.names[i] != "MERGED"
             if condition:
-                self.name_tree.insert(item, i, iid=str(i), text=self.mer.l.names[i], values=(self.mer.widths[i], self.mer.bina[i], self.mer.deci[i], self.mer.hexa[i], self.mer.desc_icon[i], self.spl.r_icon[i], self.mer.addr[i]))
+                self.name_tree.insert(item, i, iid=str(i), text=self.mer.l.names[i], values=(self.mer.l.widths[i], self.mer.l.bina[i], self.mer.l.deci[i], self.mer.l.hexa[i], self.mer.l.desc_icon[i], self.spl.l.r_icon[i], self.mer.l.addr[i]))
 
-        for (i, pg) in list(enumerate(self.spl.pages_unique)):
+        for (i, pg) in list(enumerate(self.spl.l.pages_unique)):
             if pg == 237:
                 continue
             hex_val_list = []
             self.addr_tree.insert("", i, iid=str(pg), text="Page " + f"{pg:02X}")
-            for (j, item) in list(enumerate(self.adr.num_range[i])):
+            for (j, item) in list(enumerate(self.adr.l.num_range[i])):
                 hex_val = []
                 dec_from, dec_to = item.split("~")
                 hex_from = f"{int(dec_from):02X}"
                 hex_to = f"{int(dec_to):02X}"
                 for k in range(16):
-                    hex_val.append(self.adr.hexa_per_pg[i][j * 16 + k])
+                    hex_val.append(self.adr.l.hexa_per_pg[i][j * 16 + k])
                 for x in (4, 9, 14):
                     hex_val.insert(x, "\u250a")
                 hex_val_list.append(hex_val)
                 self.addr_tree.insert(str(pg), j, iid=str(pg) + " " + item, text=hex_from + "~" + hex_to, values=tuple(hex_val_list[j]))
 
-        for (i, ancestor) in list(enumerate(self.spl.groups_unique)):
+        for (i, ancestor) in list(enumerate(self.spl.l.groups_unique)):
             if ancestor != "EDID":
                 self.hid0_tree.insert("", i, iid=ancestor + "-split", text=ancestor)
-        for (i, item) in list(enumerate(self.spl.groups)):
+        for (i, item) in list(enumerate(self.spl.l.groups)):
             try:
-                condition = i < self.spl.groups.index("EDID")
+                condition = i < self.spl.l.groups.index("EDID")
             except ValueError:
                 condition = True
             if condition:
-                self.hid0_tree.insert(item + "-split", i, iid=str(i) + "-split", text=self.spl.names_wo_width[i], values=(self.spl.widths[i], self.spl.bina[i], self.spl.deci[i], self.spl.hexa[i], self.spl.desc_icon[i], self.spl.r_icon[i], self.spl.addr_total[i]))
+                self.hid0_tree.insert(item + "-split", i, iid=str(i) + "-split", text=self.spl.l.names_wo_width[i], values=(self.spl.l.widths[i], self.spl.l.bina[i], self.spl.l.deci[i], self.spl.l.hexa[i], self.spl.l.desc_icon[i], self.spl.l.r_icon[i], self.spl.l.addr_total[i]))
 
-        for (i, pg) in list(enumerate(self.spl.pages_unique)):
+        for (i, pg) in list(enumerate(self.spl.l.pages_unique)):
             if pg != 237:
                 self.hid1_tree.insert("", i, iid=str(pg), text="Page " + f"{pg:02X}")
-        for (j, item) in list(enumerate(self.adr.pg_and_num)):
+        for (j, item) in list(enumerate(self.adr.l.pg_and_num)):
             if item.split("-")[0] != "237":
-                self.hid1_tree.insert(item.split("-")[0], j, iid=item, text=item.split("-")[1], values=(self.adr.bina[j], self.adr.hexa[j], self.adr.desc_icon[j]))
+                self.hid1_tree.insert(item.split("-")[0], j, iid=item, text=item.split("-")[1], values=(self.adr.l.bina[j], self.adr.l.hexa[j], self.adr.l.desc_icon[j]))
 
         self.bin_over_20b()
         self.get_all_children()
@@ -347,22 +347,22 @@ class RegisterTab:
     def merge(self):
         warn_tups = []
         self.mer.l.names = []
-        self.mer.widths = self.spl.widths.copy()
-        self.mer.desc = self.spl.desc.copy()
-        self.mer.desc_icon = self.spl.desc_icon.copy()
-        self.mer.addr = self.spl.addr_total.copy()
-        self.mer.bina = self.spl.bina.copy()
+        self.mer.l.widths = self.spl.l.widths.copy()
+        self.mer.l.desc = self.spl.l.desc.copy()
+        self.mer.l.desc_icon = self.spl.l.desc_icon.copy()
+        self.mer.l.addr = self.spl.l.addr_total.copy()
+        self.mer.l.bina = self.spl.l.bina.copy()
 
-        for (i, item) in list(enumerate(self.spl.merge_check)):
+        for (i, item) in list(enumerate(self.spl.l.merge_check)):
             if item is None:
                 self.mer.l.names.append("")
             elif item is not None:
-                self.mer.l.names.append(self.spl.names_wo_width[i])
+                self.mer.l.names.append(self.spl.l.names_wo_width[i])
 
         for (i0, item0) in list(enumerate(self.mer.l.names)):
             if item0 == "":
                 continue
-            for (i1, item1) in list(enumerate(self.spl.names_wo_width)):
+            for (i1, item1) in list(enumerate(self.spl.l.names_wo_width)):
                 if item0 == item1:
                     self.mer.l.names[i1] = item0
 
@@ -370,27 +370,27 @@ class RegisterTab:
             sorts = []
             if (item0 == "") | (item0 == "MERGED"):
                 continue
-            sorts.append(self.spl.names_w_width[i])
+            sorts.append(self.spl.l.names_w_width[i])
             for (j, item1) in list(enumerate(self.mer.l.names)):
                 if (item1 == "") | (i == j):
                     continue
                 if item0 == item1:
-                    sorts.append(self.spl.names_w_width[j])
+                    sorts.append(self.spl.l.names_w_width[j])
             sorts.sort(key=lambda txt: self.sort_key(txt))
 
             for (k, item) in enumerate(sorts):
                 if k == 0:
                     continue
 
-                base_index = self.spl.names_w_width.index(sorts[0])
-                prev_index = self.spl.names_w_width.index(sorts[k - 1])
-                curr_index = self.spl.names_w_width.index(item)
-                base_width = self.mer.widths[base_index]
-                prev_width = self.mer.widths[prev_index]
-                curr_width = self.mer.widths[curr_index]
-                base_desc = self.mer.desc[base_index]
-                prev_desc = self.mer.desc[prev_index]
-                curr_desc = self.mer.desc[curr_index]
+                base_index = self.spl.l.names_w_width.index(sorts[0])
+                prev_index = self.spl.l.names_w_width.index(sorts[k - 1])
+                curr_index = self.spl.l.names_w_width.index(item)
+                base_width = self.mer.l.widths[base_index]
+                prev_width = self.mer.l.widths[prev_index]
+                curr_width = self.mer.l.widths[curr_index]
+                base_desc = self.mer.l.desc[base_index]
+                prev_desc = self.mer.l.desc[prev_index]
+                curr_desc = self.mer.l.desc[curr_index]
 
                 if (":" in base_width) & (":" in curr_width):
                     if int(curr_width.split(":")[0]) > int(base_width.split(":")[0]):
@@ -455,22 +455,22 @@ class RegisterTab:
                     new_desc = "\u2022 [" + curr_width + "]\n" + curr_desc + "\n\n" + "\u2022 [" + prev_width + "]\n" + base_desc
 
                 if diff == 1:
-                    self.mer.widths[base_index] = new_width
+                    self.mer.l.widths[base_index] = new_width
                     self.mer.l.names[curr_index] = "MERGED"
-                    self.mer.addr[base_index] = self.mer.addr[base_index] + ", " + self.spl.addr_total[curr_index]
-                    self.mer.desc[base_index] = new_desc
-                    if (self.spl.desc_icon[base_index] == "") & (self.spl.desc_icon[curr_index] != ""):
-                        self.mer.desc_icon[base_index] = "ⓘ"
-                    if self.spl.bina[base_index] != "-":
-                        self.mer.bina[base_index] = self.spl.bina[curr_index] + self.mer.bina[base_index]
+                    self.mer.l.addr[base_index] = self.mer.l.addr[base_index] + ", " + self.spl.l.addr_total[curr_index]
+                    self.mer.l.desc[base_index] = new_desc
+                    if (self.spl.l.desc_icon[base_index] == "") & (self.spl.l.desc_icon[curr_index] != ""):
+                        self.mer.l.desc_icon[base_index] = "ⓘ"
+                    if self.spl.l.bina[base_index] != "-":
+                        self.mer.l.bina[base_index] = self.spl.l.bina[curr_index] + self.mer.l.bina[base_index]
                 elif (diff != 1) & (step != 1):
-                    if ((self.spl.names_w_width[prev_index], self.spl.names_w_width[curr_index]) not in warn_tups) & ((self.spl.names_w_width[curr_index], self.spl.names_w_width[prev_index]) not in warn_tups):
-                        warn_tups.append((self.spl.names_w_width[prev_index], self.spl.names_w_width[curr_index]))
-                        print("[Warning - Merge] Bits Not in Sequence: " + self.spl.names_w_width[prev_index] + ", " + self.spl.names_w_width[curr_index])
+                    if ((self.spl.l.names_w_width[prev_index], self.spl.l.names_w_width[curr_index]) not in warn_tups) & ((self.spl.l.names_w_width[curr_index], self.spl.l.names_w_width[prev_index]) not in warn_tups):
+                        warn_tups.append((self.spl.l.names_w_width[prev_index], self.spl.l.names_w_width[curr_index]))
+                        print("[Warning - Merge] Bits Not in Sequence: " + self.spl.l.names_w_width[prev_index] + ", " + self.spl.l.names_w_width[curr_index])
 
         for (i, item) in list(enumerate(self.mer.l.names)):
             if item == "":
-                self.mer.l.names[i] = self.spl.names_wo_width[i]
+                self.mer.l.names[i] = self.spl.l.names_wo_width[i]
 
     def sort_key(self, txt):
         if ("[" in txt) & (":" in txt):
@@ -481,53 +481,53 @@ class RegisterTab:
             return txt
 
     def bin_to_dec(self):
-        self.spl.deci = []
-        for (i, item) in list(enumerate(self.spl.bina)):
+        self.spl.l.deci = []
+        for (i, item) in list(enumerate(self.spl.l.bina)):
             try:
                 dec = int(item, 2)
             except ValueError:
                 dec = "-"
-            self.spl.deci.append(dec)
+            self.spl.l.deci.append(dec)
 
-        self.mer.deci = []
-        for (i, item) in list(enumerate(self.mer.bina)):
+        self.mer.l.deci = []
+        for (i, item) in list(enumerate(self.mer.l.bina)):
             try:
                 dec = int(item, 2)
             except ValueError:
                 dec = "-"
-            self.mer.deci.append(dec)
+            self.mer.l.deci.append(dec)
 
     def dec_to_hex(self):
-        for (i, item) in list(enumerate(self.spl.deci)):
+        for (i, item) in list(enumerate(self.spl.l.deci)):
             if item == "-":
                 hex = "-"
             else:
-                bits = int(ceil(len(self.spl.bina[i]) / 4))
+                bits = int(ceil(len(self.spl.l.bina[i]) / 4))
                 hex = f"{int(item):X}".zfill(bits)
-            self.spl.hexa.append(hex)
+            self.spl.l.hexa.append(hex)
 
-        for (i, item) in list(enumerate(self.mer.deci)):
+        for (i, item) in list(enumerate(self.mer.l.deci)):
             if item == "-":
                 hex = "-"
             else:
-                bits = ceil(len(self.mer.bina[i]) / 4)
+                bits = ceil(len(self.mer.l.bina[i]) / 4)
                 hex = f"{int(item):X}".zfill(bits)
-            self.mer.hexa.append(hex)
+            self.mer.l.hexa.append(hex)
 
     def bin_over_20b(self, mod=False):
         if mod:
-            for (i, item) in list(enumerate(self.mer.bina_mod)):
+            for (i, item) in list(enumerate(self.mer.l.bina_mod)):
                 try:
-                    condition = (len(item) > 20) & (i < self.spl.groups.index("EDID"))
+                    condition = (len(item) > 20) & (i < self.spl.l.groups.index("EDID"))
                 except ValueError:
                     condition = len(item) > 20
                 if condition:
                     self.name_tree.set(str(i), column="#2", value="-")
                     self.name_tree.set(str(i), column="#3", value="-")
         else:
-            for (i, item) in list(enumerate(self.mer.bina)):
+            for (i, item) in list(enumerate(self.mer.l.bina)):
                 try:
-                    condition = (len(item) > 20) & (i < self.spl.groups.index("EDID"))
+                    condition = (len(item) > 20) & (i < self.spl.l.groups.index("EDID"))
                 except ValueError:
                     condition = len(item) > 20
                 if condition:
@@ -535,30 +535,30 @@ class RegisterTab:
                     self.name_tree.set(str(i), column="#3", value="-")
 
     def name_to_addr(self):
-        self.adr.num_range = []
-        self.adr.pg_and_num = []
-        self.adr.bina = []
-        self.adr.hexa = []
-        self.adr.desc = []
-        self.adr.desc_icon = []
-        self.adr.num_per_pg = []
-        self.adr.hexa_per_pg = []
+        self.adr.l.num_range = []
+        self.adr.l.pg_and_num = []
+        self.adr.l.bina = []
+        self.adr.l.hexa = []
+        self.adr.l.desc = []
+        self.adr.l.desc_icon = []
+        self.adr.l.num_per_pg = []
+        self.adr.l.hexa_per_pg = []
         prev_last_index = 0
-        for (i, pg) in list(enumerate(self.spl.pages_unique)):
+        for (i, pg) in list(enumerate(self.spl.l.pages_unique)):
             pg_addr_range = []
             pg_bin = []
             pg_desc = []
-            curr_last_index = len(self.spl.pages) - self.spl.pages[::-1].index(pg) - 1
+            curr_last_index = len(self.spl.l.pages) - self.spl.l.pages[::-1].index(pg) - 1
 
-            sorted_addr = sorted(self.spl.addr_num[prev_last_index:curr_last_index + 1], key=int)
+            sorted_addr = sorted(self.spl.l.addr_num[prev_last_index:curr_last_index + 1], key=int)
             sorted_addr_unique = []
             for j in range(int(sorted_addr[-1]) + 1):
                 if j not in sorted_addr_unique:
                     sorted_addr_unique.append(j)
-                if str(j) not in self.spl.addr_num[prev_last_index:curr_last_index + 1]:
+                if str(j) not in self.spl.l.addr_num[prev_last_index:curr_last_index + 1]:
                     pg_bin.append("-")
                     pg_desc.append(None)
-                elif str(j) in self.spl.addr_num[prev_last_index:curr_last_index + 1]:
+                elif str(j) in self.spl.l.addr_num[prev_last_index:curr_last_index + 1]:
                     pg_bin.append("00000000")
                     pg_desc.append("")
 
@@ -568,52 +568,52 @@ class RegisterTab:
                         pg_addr_range.append(str(k) + "~" + str(k + 15))
                 elif k == int(sorted_addr_unique[-1]) - (int(sorted_addr_unique[-1]) % 16):
                     pg_addr_range.append(str(k) + "~" + str(sorted_addr_unique[-1]))
-            self.adr.num_range.append(pg_addr_range)
+            self.adr.l.num_range.append(pg_addr_range)
 
-            for (n, num) in list(enumerate(self.spl.addr_num))[prev_last_index:curr_last_index + 1]:
-                if (":" in self.spl.addr_bit[n]) & (self.spl.bina[n] != "-"):
-                    pg_bin[int(num)] = self.p.replace_text(int(self.spl.addr_bit[n].split(":")[1]), int(self.spl.addr_bit[n].split(":")[0]), self.spl.bina[n], text=pg_bin[int(num)])
-                elif (":" in self.spl.addr_bit[n]) & (self.spl.bina[n] == "-"):
-                    pg_bin[int(num)] = self.p.replace_text(int(self.spl.addr_bit[n].split(":")[1]), int(self.spl.addr_bit[n].split(":")[0]), "0" * (int(self.spl.addr_bit[n].split(":")[0]) - int(self.spl.addr_bit[n].split(":")[1]) + 1), text=pg_bin[int(num)])
-                elif (":" not in self.spl.addr_bit[n]) & (self.spl.bina[n] != "-"):
-                    pg_bin[int(num)] = self.p.replace_text(int(self.spl.addr_bit[n]), None, self.spl.bina[n], text=pg_bin[int(num)])
-                elif (":" not in self.spl.addr_bit[n]) & (self.spl.bina[n] == "-"):
-                    pg_bin[int(num)] = self.p.replace_text(int(self.spl.addr_bit[n]), None, "0", text=pg_bin[int(num)])
+            for (n, num) in list(enumerate(self.spl.l.addr_num))[prev_last_index:curr_last_index + 1]:
+                if (":" in self.spl.l.addr_bit[n]) & (self.spl.l.bina[n] != "-"):
+                    pg_bin[int(num)] = self.p.replace_text(int(self.spl.l.addr_bit[n].split(":")[1]), int(self.spl.l.addr_bit[n].split(":")[0]), self.spl.l.bina[n], text=pg_bin[int(num)])
+                elif (":" in self.spl.l.addr_bit[n]) & (self.spl.l.bina[n] == "-"):
+                    pg_bin[int(num)] = self.p.replace_text(int(self.spl.l.addr_bit[n].split(":")[1]), int(self.spl.l.addr_bit[n].split(":")[0]), "0" * (int(self.spl.l.addr_bit[n].split(":")[0]) - int(self.spl.l.addr_bit[n].split(":")[1]) + 1), text=pg_bin[int(num)])
+                elif (":" not in self.spl.l.addr_bit[n]) & (self.spl.l.bina[n] != "-"):
+                    pg_bin[int(num)] = self.p.replace_text(int(self.spl.l.addr_bit[n]), None, self.spl.l.bina[n], text=pg_bin[int(num)])
+                elif (":" not in self.spl.l.addr_bit[n]) & (self.spl.l.bina[n] == "-"):
+                    pg_bin[int(num)] = self.p.replace_text(int(self.spl.l.addr_bit[n]), None, "0", text=pg_bin[int(num)])
                 if pg_desc[int(num)] is not None:
-                    pg_desc[int(num)] = pg_desc[int(num)] + "(" + self.spl.addr_bit[n] + ")\n" + self.spl.names_w_width[n] + "\n\n"
+                    pg_desc[int(num)] = pg_desc[int(num)] + "(" + self.spl.l.addr_bit[n] + ")\n" + self.spl.l.names_w_width[n] + "\n\n"
 
             for x in range(int(sorted_addr[-1]) + 1):
-                self.adr.pg_and_num.append(str(pg) + "-" + str(x))
-                self.adr.bina.append(pg_bin[x])
+                self.adr.l.pg_and_num.append(str(pg) + "-" + str(x))
+                self.adr.l.bina.append(pg_bin[x])
                 if pg_bin[x] == "-":
-                    self.adr.hexa.append("-")
+                    self.adr.l.hexa.append("-")
                 elif pg_bin[x] != "-":
-                    self.adr.hexa.append(f"{int(pg_bin[x], 2):02X}")
+                    self.adr.l.hexa.append(f"{int(pg_bin[x], 2):02X}")
                 if pg_desc[x] is None:
-                    self.adr.desc.append(None)
+                    self.adr.l.desc.append(None)
                 elif pg_desc is not None:
-                    self.adr.desc.append(pg_desc[x][:-2])
+                    self.adr.l.desc.append(pg_desc[x][:-2])
                 if pg_bin[x] != "-":
-                    self.adr.desc_icon.append("ⓘ")
+                    self.adr.l.desc_icon.append("ⓘ")
                 elif pg_bin[x] == "-":
-                    self.adr.desc_icon.append("")
+                    self.adr.l.desc_icon.append("")
             prev_last_index = curr_last_index + 1
 
         cnt = 0
-        for (i, pg) in list(enumerate(self.spl.pages_unique)):
+        for (i, pg) in list(enumerate(self.spl.l.pages_unique)):
             pg_hex_range = []
             pg_addr = []
-            for (j, item) in list(enumerate(self.adr.pg_and_num)):
+            for (j, item) in list(enumerate(self.adr.l.pg_and_num)):
                 if str(pg) == item.split("-")[0]:
                     pg_addr.append(item.split("-")[1])
-            self.adr.num_per_pg.append(pg_addr)
+            self.adr.l.num_per_pg.append(pg_addr)
 
-            for k in range(len(self.adr.num_per_pg[i])):
-                pg_hex_range.append(self.adr.hexa[cnt + k])
-                if k == len(self.adr.num_per_pg[i]) - 1:
+            for k in range(len(self.adr.l.num_per_pg[i])):
+                pg_hex_range.append(self.adr.l.hexa[cnt + k])
+                if k == len(self.adr.l.num_per_pg[i]) - 1:
                     cnt += k + 1
             pg_hex_range.extend([""] * (16 - (len(pg_hex_range) % 16)))
-            self.adr.hexa_per_pg.append(pg_hex_range)
+            self.adr.l.hexa_per_pg.append(pg_hex_range)
 
     # name_tree click event
     def popup0(self, event, click_type):
@@ -621,7 +621,7 @@ class RegisterTab:
         row = self.name_tree.identify_row(event.y)
         name = self.name_tree.item(row, "text")
         val = self.name_tree.item(row, "value")
-        if (row in self.spl.groups_unique) | (row == ""):
+        if (row in self.spl.l.groups_unique) | (row == ""):
             return
         if click_type == 1:
             self.popup_entry0(col, row, name, val)
@@ -654,8 +654,8 @@ class RegisterTab:
             if dec_valid.search(new_value) is not None:
                 messagebox.showerror("INPUT ERROR", "Input a Valid DECIMAL Number\n\"" + new_value + "\" is Not Valid")
             elif new_value != val[2]:
-                if int(new_value) > int("1" * len(self.mer.bina[int(row)]), 2):
-                    new_value = str(int("1" * len(self.mer.bina[int(row)]), 2))
+                if int(new_value) > int("1" * len(self.mer.l.bina[int(row)]), 2):
+                    new_value = str(int("1" * len(self.mer.l.bina[int(row)]), 2))
                     if new_value == val[2]:
                         return
                 self.modify0(col, row, name, val, new_value)
@@ -670,39 +670,39 @@ class RegisterTab:
             if len(new_value) > len(val[3]):
                 new_value = new_value[-len(val[3]):]
             if new_value.zfill(len(val[3])).upper() != val[3]:
-                if int(new_value, 16) > int("1" * len(self.mer.bina[int(row)]), 2):
-                    new_value = f"{int('1' * len(self.mer.bina[int(row)]), 2):X}".zfill(len(val[3]))
+                if int(new_value, 16) > int("1" * len(self.mer.l.bina[int(row)]), 2):
+                    new_value = f"{int('1' * len(self.mer.l.bina[int(row)]), 2):X}".zfill(len(val[3]))
                     if new_value == val[3]:
                         return
                 self.modify0(col, row, name, val, new_value)
 
     def popup_desc0(self, col, row, name, val):
         if (col == "#5") & (val[4] != ""):
-            messagebox.showinfo(name, self.mer.desc[int(row)])
+            messagebox.showinfo(name, self.mer.l.desc[int(row)])
 
     def modify0(self, col, row, name, val, new, mod_tag="modified"):
         if col == "#2":
-            if val[1] == new.zfill(len(self.mer.bina[int(row)])):
+            if val[1] == new.zfill(len(self.mer.l.bina[int(row)])):
                 return
-            self.mer.bina_mod[int(row)] = new.zfill(len(self.mer.bina[int(row)]))
-            self.mer.deci_mod[int(row)] = int(new, 2)
-            self.mer.hexa_mod[int(row)] = f"{int(new, 2):X}".zfill(len(val[3]))
+            self.mer.l.bina_mod[int(row)] = new.zfill(len(self.mer.l.bina[int(row)]))
+            self.mer.l.deci_mod[int(row)] = int(new, 2)
+            self.mer.l.hexa_mod[int(row)] = f"{int(new, 2):X}".zfill(len(val[3]))
         if col == "#3":
             if val[2] == new:
                 return
-            self.mer.bina_mod[int(row)] = f"{int(new):b}".zfill(len(self.mer.bina[int(row)]))
-            self.mer.deci_mod[int(row)] = new
-            self.mer.hexa_mod[int(row)] = f"{int(new):X}".zfill(len(val[3]))
+            self.mer.l.bina_mod[int(row)] = f"{int(new):b}".zfill(len(self.mer.l.bina[int(row)]))
+            self.mer.l.deci_mod[int(row)] = new
+            self.mer.l.hexa_mod[int(row)] = f"{int(new):X}".zfill(len(val[3]))
         if col == "#4":
             if val[3] == new.upper().zfill(len(val[3])):
                 return
-            self.mer.bina_mod[int(row)] = f"{int(new, 16):b}".zfill(len(self.mer.bina[int(row)]))
-            self.mer.deci_mod[int(row)] = int(new, 16)
-            self.mer.hexa_mod[int(row)] = new.upper().zfill(len(val[3]))
+            self.mer.l.bina_mod[int(row)] = f"{int(new, 16):b}".zfill(len(self.mer.l.bina[int(row)]))
+            self.mer.l.deci_mod[int(row)] = int(new, 16)
+            self.mer.l.hexa_mod[int(row)] = new.upper().zfill(len(val[3]))
 
-        self.name_tree.set(row, column="#2", value=self.mer.bina_mod[int(row)])
-        self.name_tree.set(row, column="#3", value=self.mer.deci_mod[int(row)])
-        self.name_tree.set(row, column="#4", value=self.mer.hexa_mod[int(row)])
+        self.name_tree.set(row, column="#2", value=self.mer.l.bina_mod[int(row)])
+        self.name_tree.set(row, column="#3", value=self.mer.l.deci_mod[int(row)])
+        self.name_tree.set(row, column="#4", value=self.mer.l.hexa_mod[int(row)])
 
         self.name_tree.item(row, tag=mod_tag)
         self.name_tree.item(self.name_tree.parent(row), tag="modified")
@@ -714,72 +714,72 @@ class RegisterTab:
 
     def mod0_mg2sp(self, row, name, mod_tag):
         spl_iid = []
-        if self.spl.names_wo_width.count(name) == 1:
+        if self.spl.l.names_wo_width.count(name) == 1:
             spl_iid.append(int(row))
-            self.spl.bina_mod[int(row)] = self.mer.bina_mod[int(row)]
-            self.spl.deci_mod[int(row)] = int(self.spl.bina_mod[int(row)], 2)
-            self.spl.hexa_mod[int(row)] = f"{int(self.spl.bina_mod[int(row)], 2):X}".zfill(len(self.spl.hexa_mod[int(row)]))
+            self.spl.l.bina_mod[int(row)] = self.mer.l.bina_mod[int(row)]
+            self.spl.l.deci_mod[int(row)] = int(self.spl.l.bina_mod[int(row)], 2)
+            self.spl.l.hexa_mod[int(row)] = f"{int(self.spl.l.bina_mod[int(row)], 2):X}".zfill(len(self.spl.l.hexa_mod[int(row)]))
             self.hid0_tree.item(row + "-split", tag=mod_tag)
             self.hid0_tree.item(self.hid0_tree.parent(row + "-split"), tag="modified")
-        elif self.spl.names_wo_width.count(name) > 1:
-            for (i, item) in list(enumerate(self.spl.names_wo_width)):
+        elif self.spl.l.names_wo_width.count(name) > 1:
+            for (i, item) in list(enumerate(self.spl.l.names_wo_width)):
                 if name == item:
                     spl_iid.append(i)
-                    if ":" in self.spl.widths[i]:
-                        large, small = [int(num) for num in self.spl.widths[i].split(":")]
-                        if self.spl.bina_mod[i] != self.mer.bina_mod[int(row)][len(self.mer.bina_mod[int(row)]) - 1 - large:len(self.mer.bina_mod[int(row)]) - small]:
-                            self.spl.bina_mod[i] = self.mer.bina_mod[int(row)][len(self.mer.bina_mod[int(row)]) - 1 - large:len(self.mer.bina_mod[int(row)]) - small]
+                    if ":" in self.spl.l.widths[i]:
+                        large, small = [int(num) for num in self.spl.l.widths[i].split(":")]
+                        if self.spl.l.bina_mod[i] != self.mer.l.bina_mod[int(row)][len(self.mer.l.bina_mod[int(row)]) - 1 - large:len(self.mer.l.bina_mod[int(row)]) - small]:
+                            self.spl.l.bina_mod[i] = self.mer.l.bina_mod[int(row)][len(self.mer.l.bina_mod[int(row)]) - 1 - large:len(self.mer.l.bina_mod[int(row)]) - small]
                             self.hid0_tree.item(str(i) + "-split", tag=mod_tag)
                             self.hid0_tree.item(self.hid0_tree.parent(str(i) + "-split"), tag="modified")
-                    elif ":" not in self.spl.widths[i]:
-                        if self.spl.bina_mod[i] != self.mer.bina_mod[int(row)][len(self.mer.bina_mod[int(row)]) - 1 - int(self.spl.widths[i])]:
-                            self.spl.bina_mod[i] = self.mer.bina_mod[int(row)][len(self.mer.bina_mod[int(row)]) - 1 - int(self.spl.widths[i])]
+                    elif ":" not in self.spl.l.widths[i]:
+                        if self.spl.l.bina_mod[i] != self.mer.l.bina_mod[int(row)][len(self.mer.l.bina_mod[int(row)]) - 1 - int(self.spl.l.widths[i])]:
+                            self.spl.l.bina_mod[i] = self.mer.l.bina_mod[int(row)][len(self.mer.l.bina_mod[int(row)]) - 1 - int(self.spl.l.widths[i])]
                             self.hid0_tree.item(str(i) + "-split", tag=mod_tag)
                             self.hid0_tree.item(self.hid0_tree.parent(str(i) + "-split"), tag="modified")
-                    self.spl.deci_mod[i] = int(self.spl.bina_mod[i], 2)
-                    self.spl.hexa_mod[i] = f"{int(self.spl.bina_mod[i], 2):X}".zfill(len(self.spl.hexa_mod[i]))
+                    self.spl.l.deci_mod[i] = int(self.spl.l.bina_mod[i], 2)
+                    self.spl.l.hexa_mod[i] = f"{int(self.spl.l.bina_mod[i], 2):X}".zfill(len(self.spl.l.hexa_mod[i]))
 
         for iid in spl_iid:
-            self.hid0_tree.set(str(iid) + "-split", column="#2", value=self.spl.bina_mod[iid])
-            self.hid0_tree.set(str(iid) + "-split", column="#3", value=self.spl.deci_mod[iid])
-            self.hid0_tree.set(str(iid) + "-split", column="#4", value=self.spl.hexa_mod[iid])
+            self.hid0_tree.set(str(iid) + "-split", column="#2", value=self.spl.l.bina_mod[iid])
+            self.hid0_tree.set(str(iid) + "-split", column="#3", value=self.spl.l.deci_mod[iid])
+            self.hid0_tree.set(str(iid) + "-split", column="#4", value=self.spl.l.hexa_mod[iid])
 
     def mod0_sp2ad(self, name, mod_tag):
         adr_iid = []
-        for (i, item) in list(enumerate(self.spl.names_wo_width)):
+        for (i, item) in list(enumerate(self.spl.l.names_wo_width)):
             if name == item:
-                page_num, bit = self.spl.addr_total[i].strip(")").split("(")
+                page_num, bit = self.spl.l.addr_total[i].strip(")").split("(")
                 page, num = page_num.split("-")
                 adr_iid.append(page_num)
 
                 if ":" in bit:
-                    if self.adr.bina_mod[self.adr.pg_and_num.index(page_num)] != self.p.replace_text(int(bit.split(":")[1]), int(bit.split(":")[0]), self.spl.bina_mod[i], text=self.adr.bina_mod[self.adr.pg_and_num.index(page_num)]):
-                        self.adr.bina_mod[self.adr.pg_and_num.index(page_num)] = self.p.replace_text(int(bit.split(":")[1]), int(bit.split(":")[0]), self.spl.bina_mod[i], text=self.adr.bina_mod[self.adr.pg_and_num.index(page_num)])
-                        self.adr.hexa_mod[self.adr.pg_and_num.index(page_num)] = f"{int(self.adr.bina_mod[self.adr.pg_and_num.index(page_num)], 2):02X}"
-                        self.adr.hexa_per_pg_mod[self.spl.pages_unique.index(int(page))][int(num)] = self.adr.hexa_mod[self.adr.pg_and_num.index(page_num)]
+                    if self.adr.l.bina_mod[self.adr.l.pg_and_num.index(page_num)] != self.p.replace_text(int(bit.split(":")[1]), int(bit.split(":")[0]), self.spl.l.bina_mod[i], text=self.adr.l.bina_mod[self.adr.l.pg_and_num.index(page_num)]):
+                        self.adr.l.bina_mod[self.adr.l.pg_and_num.index(page_num)] = self.p.replace_text(int(bit.split(":")[1]), int(bit.split(":")[0]), self.spl.l.bina_mod[i], text=self.adr.l.bina_mod[self.adr.l.pg_and_num.index(page_num)])
+                        self.adr.l.hexa_mod[self.adr.l.pg_and_num.index(page_num)] = f"{int(self.adr.l.bina_mod[self.adr.l.pg_and_num.index(page_num)], 2):02X}"
+                        self.adr.l.hexa_per_pg_mod[self.spl.l.pages_unique.index(int(page))][int(num)] = self.adr.l.hexa_mod[self.adr.l.pg_and_num.index(page_num)]
                         self.hid1_tree.item(page_num, tag=mod_tag)
                         self.hid1_tree.item(self.hid1_tree.parent(page_num), tag="modified")
-                        self.addr_tree.item((page + " " + self.adr.num_range[self.spl.pages_unique.index(int(page))][int(num) // 16]), tag=mod_tag)
-                        self.addr_tree.item(self.addr_tree.parent(page + " " + self.adr.num_range[self.spl.pages_unique.index(int(page))][int(num) // 16]), tag="pg_modified")
+                        self.addr_tree.item((page + " " + self.adr.l.num_range[self.spl.l.pages_unique.index(int(page))][int(num) // 16]), tag=mod_tag)
+                        self.addr_tree.item(self.addr_tree.parent(page + " " + self.adr.l.num_range[self.spl.l.pages_unique.index(int(page))][int(num) // 16]), tag="pg_modified")
                 elif ":" not in bit:
-                    if self.adr.bina_mod[self.adr.pg_and_num.index(page_num)] != self.p.replace_text(int(bit), None, self.spl.bina_mod[i], text=self.adr.bina_mod[self.adr.pg_and_num.index(page_num)]):
-                        self.adr.bina_mod[self.adr.pg_and_num.index(page_num)] = self.p.replace_text(int(bit), None, self.spl.bina_mod[i], text=self.adr.bina_mod[self.adr.pg_and_num.index(page_num)])
-                        self.adr.hexa_mod[self.adr.pg_and_num.index(page_num)] = f"{int(self.adr.bina_mod[self.adr.pg_and_num.index(page_num)], 2):02X}"
-                        self.adr.hexa_per_pg_mod[self.spl.pages_unique.index(int(page))][int(num)] = self.adr.hexa_mod[self.adr.pg_and_num.index(page_num)]
+                    if self.adr.l.bina_mod[self.adr.l.pg_and_num.index(page_num)] != self.p.replace_text(int(bit), None, self.spl.l.bina_mod[i], text=self.adr.l.bina_mod[self.adr.l.pg_and_num.index(page_num)]):
+                        self.adr.l.bina_mod[self.adr.l.pg_and_num.index(page_num)] = self.p.replace_text(int(bit), None, self.spl.l.bina_mod[i], text=self.adr.l.bina_mod[self.adr.l.pg_and_num.index(page_num)])
+                        self.adr.l.hexa_mod[self.adr.l.pg_and_num.index(page_num)] = f"{int(self.adr.l.bina_mod[self.adr.l.pg_and_num.index(page_num)], 2):02X}"
+                        self.adr.l.hexa_per_pg_mod[self.spl.l.pages_unique.index(int(page))][int(num)] = self.adr.l.hexa_mod[self.adr.l.pg_and_num.index(page_num)]
                         self.hid1_tree.item(page_num, tag=mod_tag)
                         self.hid1_tree.item(self.hid1_tree.parent(page_num), tag="modified")
-                        self.addr_tree.item((page + " " + self.adr.num_range[self.spl.pages_unique.index(int(page))][int(num) // 16]), tag=mod_tag)
-                        self.addr_tree.item(self.addr_tree.parent(page + " " + self.adr.num_range[self.spl.pages_unique.index(int(page))][int(num) // 16]), tag="pg_modified")
+                        self.addr_tree.item((page + " " + self.adr.l.num_range[self.spl.l.pages_unique.index(int(page))][int(num) // 16]), tag=mod_tag)
+                        self.addr_tree.item(self.addr_tree.parent(page + " " + self.adr.l.num_range[self.spl.l.pages_unique.index(int(page))][int(num) // 16]), tag="pg_modified")
 
         for iid in adr_iid:
-            self.hid1_tree.set(iid, column="#1", value=self.adr.bina_mod[self.adr.pg_and_num.index(iid)])
-            self.hid1_tree.set(iid, column="#2", value=self.adr.hexa_mod[self.adr.pg_and_num.index(iid)])
+            self.hid1_tree.set(iid, column="#1", value=self.adr.l.bina_mod[self.adr.l.pg_and_num.index(iid)])
+            self.hid1_tree.set(iid, column="#2", value=self.adr.l.hexa_mod[self.adr.l.pg_and_num.index(iid)])
 
             pg, num = iid.split("-")
-            pg_idx = self.spl.pages_unique.index(int(pg))
-            row = pg + " " + self.adr.num_range[pg_idx][int(num) // 16]
-            num_l, num_r = [int(x) for x in self.adr.num_range[pg_idx][int(num) // 16].split("~")]
-            row_hexa = self.adr.hexa_per_pg_mod[pg_idx][num_l:num_r + 1]
+            pg_idx = self.spl.l.pages_unique.index(int(pg))
+            row = pg + " " + self.adr.l.num_range[pg_idx][int(num) // 16]
+            num_l, num_r = [int(x) for x in self.adr.l.num_range[pg_idx][int(num) // 16].split("~")]
+            row_hexa = self.adr.l.hexa_per_pg_mod[pg_idx][num_l:num_r + 1]
             for i in (4, 9, 14):
                 row_hexa.insert(i, "\u250a")
             for (i, hex) in list(enumerate(row_hexa, 1)):
@@ -791,13 +791,13 @@ class RegisterTab:
         row = self.addr_tree.identify_row(event.y)
         name = self.addr_tree.item(row, "text")
         val = self.addr_tree.item(row, "value")
-        if (row in [str(item) for item in self.spl.pages_unique]) | (row == "") | (col == "") | (col == "#20"):
+        if (row in [str(item) for item in self.spl.l.pages_unique]) | (row == "") | (col == "") | (col == "#20"):
             return
         if val[int(col.strip("#")) - 1] in ("-", "", "\u250a"):
             return
         pg, rng = row.split()
         c = int(col.strip("#")) - 1
-        num = self.adr.num_range[self.spl.pages_unique.index(int(pg))].index(rng) * 16 + int(self.reg.l.hex_col[c], 16)
+        num = self.adr.l.num_range[self.spl.l.pages_unique.index(int(pg))].index(rng) * 16 + int(self.reg.l.hex_col[c], 16)
         if click_type == 1:
             self.popup_entry1(row, name, val, pg, c, num)
         elif click_type == 3:
@@ -821,17 +821,17 @@ class RegisterTab:
             self.modify1(row, pg, num, new_value, mod_tag="modified")
 
     def popup_desc1(self, pg, num):
-        messagebox.showinfo(pg + "-" + str(num), self.adr.desc[self.adr.pg_and_num.index(pg + "-" + str(num))])
+        messagebox.showinfo(pg + "-" + str(num), self.adr.l.desc[self.adr.l.pg_and_num.index(pg + "-" + str(num))])
 
     def modify1(self, row, pg, num, new, mod_tag="modified"):
-        pg_idx = self.spl.pages_unique.index(int(pg))
-        if new.upper().zfill(2) == self.adr.hexa_per_pg_mod[pg_idx][num]:
+        pg_idx = self.spl.l.pages_unique.index(int(pg))
+        if new.upper().zfill(2) == self.adr.l.hexa_per_pg_mod[pg_idx][num]:
             return
 
-        self.adr.hexa_per_pg_mod[pg_idx][num] = new.upper().zfill(2)
+        self.adr.l.hexa_per_pg_mod[pg_idx][num] = new.upper().zfill(2)
 
-        num_l, num_r = [int(x) for x in self.adr.num_range[pg_idx][int(num) // 16].split("~")]
-        row_hexa = self.adr.hexa_per_pg_mod[pg_idx][num_l:num_r + 1]
+        num_l, num_r = [int(x) for x in self.adr.l.num_range[pg_idx][int(num) // 16].split("~")]
+        row_hexa = self.adr.l.hexa_per_pg_mod[pg_idx][num_l:num_r + 1]
         for i in (4, 9, 14):
             row_hexa.insert(i, "\u250a")
         for (i, hex) in list(enumerate(row_hexa, 1)):
@@ -846,63 +846,63 @@ class RegisterTab:
         self.bin_over_20b(mod=True)
 
     def mod1_ad2sp(self, pg, num, mod_tag):
-        self.adr.hexa_mod[self.adr.pg_and_num.index(pg + "-" + str(num))] = self.adr.hexa_per_pg_mod[self.spl.pages_unique.index(int(pg))][num]
-        self.adr.bina_mod[self.adr.pg_and_num.index(pg + "-" + str(num))] = f"{int(self.adr.hexa_per_pg_mod[self.spl.pages_unique.index(int(pg))][num], 16):08b}"
+        self.adr.l.hexa_mod[self.adr.l.pg_and_num.index(pg + "-" + str(num))] = self.adr.l.hexa_per_pg_mod[self.spl.l.pages_unique.index(int(pg))][num]
+        self.adr.l.bina_mod[self.adr.l.pg_and_num.index(pg + "-" + str(num))] = f"{int(self.adr.l.hexa_per_pg_mod[self.spl.l.pages_unique.index(int(pg))][num], 16):08b}"
 
         spl_idx = []
-        for (idx, addr) in list(enumerate([x.split("(")[0] for x in self.spl.addr_total])):
+        for (idx, addr) in list(enumerate([x.split("(")[0] for x in self.spl.l.addr_total])):
             if addr == pg + "-" + str(num):
                 spl_idx.append(idx)
 
         for i in spl_idx:
-            if ":" in self.spl.addr_bit[i]:
-                self.spl.bina_mod[i] = self.adr.bina_mod[self.adr.pg_and_num.index(pg + "-" + str(num))][7 - int(self.spl.addr_bit[i].split(":")[0]):8 - int(self.spl.addr_bit[i].split(":")[1])]
-            elif ":" not in self.spl.addr_bit[i]:
-                self.spl.bina_mod[i] = self.adr.bina_mod[self.adr.pg_and_num.index(pg + "-" + str(num))][7 - int(self.spl.addr_bit[i])]
-            self.spl.deci_mod[i] = int(self.spl.bina_mod[i], 2)
-            self.spl.hexa_mod[i] = f"{int(self.spl.bina_mod[i], 2):X}".zfill(len(self.spl.hexa[i]))
+            if ":" in self.spl.l.addr_bit[i]:
+                self.spl.l.bina_mod[i] = self.adr.l.bina_mod[self.adr.l.pg_and_num.index(pg + "-" + str(num))][7 - int(self.spl.l.addr_bit[i].split(":")[0]):8 - int(self.spl.l.addr_bit[i].split(":")[1])]
+            elif ":" not in self.spl.l.addr_bit[i]:
+                self.spl.l.bina_mod[i] = self.adr.l.bina_mod[self.adr.l.pg_and_num.index(pg + "-" + str(num))][7 - int(self.spl.l.addr_bit[i])]
+            self.spl.l.deci_mod[i] = int(self.spl.l.bina_mod[i], 2)
+            self.spl.l.hexa_mod[i] = f"{int(self.spl.l.bina_mod[i], 2):X}".zfill(len(self.spl.l.hexa[i]))
 
-        self.hid1_tree.set(pg + "-" + str(num), column="#1", value=self.adr.bina_mod[self.adr.pg_and_num.index(pg + "-" + str(num))])
-        self.hid1_tree.set(pg + "-" + str(num), column="#2", value=self.adr.hexa_mod[self.adr.pg_and_num.index(pg + "-" + str(num))])
+        self.hid1_tree.set(pg + "-" + str(num), column="#1", value=self.adr.l.bina_mod[self.adr.l.pg_and_num.index(pg + "-" + str(num))])
+        self.hid1_tree.set(pg + "-" + str(num), column="#2", value=self.adr.l.hexa_mod[self.adr.l.pg_and_num.index(pg + "-" + str(num))])
 
         for j in spl_idx:
-            self.hid0_tree.set(str(j) + "-split", column="#2", value=self.spl.bina_mod[j])
-            self.hid0_tree.set(str(j) + "-split", column="#3", value=self.spl.deci_mod[j])
-            self.hid0_tree.set(str(j) + "-split", column="#4", value=self.spl.hexa_mod[j])
+            self.hid0_tree.set(str(j) + "-split", column="#2", value=self.spl.l.bina_mod[j])
+            self.hid0_tree.set(str(j) + "-split", column="#3", value=self.spl.l.deci_mod[j])
+            self.hid0_tree.set(str(j) + "-split", column="#4", value=self.spl.l.hexa_mod[j])
 
         self.hid1_tree.item(pg + "-" + str(num), tag=mod_tag)
         self.hid1_tree.item(self.hid1_tree.parent(pg + "-" + str(num)), tag="modified")
         for k in spl_idx:
-            if self.spl.bina_mod[k] != self.spl.bina[k]:
+            if self.spl.l.bina_mod[k] != self.spl.l.bina[k]:
                 self.hid0_tree.item(str(k) + "-split", tag=mod_tag)
                 self.hid0_tree.item(self.hid0_tree.parent(str(k) + "-split"), tag="modified")
 
     def mod1_sp2mg(self, pg, num, mod_tag):
         spl_idx = []
-        for (idx, addr) in list(enumerate([x.split("(")[0] for x in self.spl.addr_total])):
+        for (idx, addr) in list(enumerate([x.split("(")[0] for x in self.spl.l.addr_total])):
             if addr == pg + "-" + str(num):
                 spl_idx.append(idx)
 
         for i in spl_idx:
-            mer_idx = self.mer.l.names.index(self.spl.names_wo_width[i])
-            if self.spl.names_wo_width.count(self.spl.names_wo_width[i]) == 1:
-                self.mer.bina_mod[mer_idx] = self.spl.bina_mod[i]
-                self.mer.deci_mod[mer_idx] = self.spl.deci_mod[i]
-                self.mer.hexa_mod[mer_idx] = self.spl.hexa_mod[i]
-            elif self.spl.names_wo_width.count(self.spl.names_wo_width[i]) > 1:
-                if ":" in self.spl.widths[i]:
-                    self.mer.bina_mod[mer_idx] = self.p.replace_text(int(self.spl.widths[i].split(":")[1]), int(self.spl.widths[i].split(":")[0]), self.spl.bina_mod[i], self.mer.bina_mod[mer_idx])
-                elif ":" not in self.spl.widths[i]:
-                    self.mer.bina_mod[mer_idx] = self.p.replace_text(int(self.spl.widths[i]), None, self.spl.bina_mod[i], self.mer.bina_mod[mer_idx])
-                self.mer.deci_mod[mer_idx] = int(self.mer.bina_mod[mer_idx], 2)
-                self.mer.hexa_mod[mer_idx] = f"{self.mer.deci_mod[mer_idx]:X}".zfill(len(self.mer.hexa[mer_idx]))
+            mer_idx = self.mer.l.names.index(self.spl.l.names_wo_width[i])
+            if self.spl.l.names_wo_width.count(self.spl.l.names_wo_width[i]) == 1:
+                self.mer.l.bina_mod[mer_idx] = self.spl.l.bina_mod[i]
+                self.mer.l.deci_mod[mer_idx] = self.spl.l.deci_mod[i]
+                self.mer.l.hexa_mod[mer_idx] = self.spl.l.hexa_mod[i]
+            elif self.spl.l.names_wo_width.count(self.spl.l.names_wo_width[i]) > 1:
+                if ":" in self.spl.l.widths[i]:
+                    self.mer.l.bina_mod[mer_idx] = self.p.replace_text(int(self.spl.l.widths[i].split(":")[1]), int(self.spl.l.widths[i].split(":")[0]), self.spl.l.bina_mod[i], self.mer.l.bina_mod[mer_idx])
+                elif ":" not in self.spl.l.widths[i]:
+                    self.mer.l.bina_mod[mer_idx] = self.p.replace_text(int(self.spl.l.widths[i]), None, self.spl.l.bina_mod[i], self.mer.l.bina_mod[mer_idx])
+                self.mer.l.deci_mod[mer_idx] = int(self.mer.l.bina_mod[mer_idx], 2)
+                self.mer.l.hexa_mod[mer_idx] = f"{self.mer.l.deci_mod[mer_idx]:X}".zfill(len(self.mer.l.hexa[mer_idx]))
 
         for j in spl_idx:
-            mer_idx = self.mer.l.names.index(self.spl.names_wo_width[j])
-            self.name_tree.set(str(mer_idx), column="#2", value=self.mer.bina_mod[mer_idx])
-            self.name_tree.set(str(mer_idx), column="#3", value=self.mer.deci_mod[mer_idx])
-            self.name_tree.set(str(mer_idx), column="#4", value=self.mer.hexa_mod[mer_idx])
-            if self.mer.bina_mod[mer_idx] != self.mer.bina[mer_idx]:
+            mer_idx = self.mer.l.names.index(self.spl.l.names_wo_width[j])
+            self.name_tree.set(str(mer_idx), column="#2", value=self.mer.l.bina_mod[mer_idx])
+            self.name_tree.set(str(mer_idx), column="#3", value=self.mer.l.deci_mod[mer_idx])
+            self.name_tree.set(str(mer_idx), column="#4", value=self.mer.l.hexa_mod[mer_idx])
+            if self.mer.l.bina_mod[mer_idx] != self.mer.l.bina[mer_idx]:
                 self.name_tree.item(mer_idx, tag=mod_tag)
                 self.name_tree.item(self.name_tree.parent(mer_idx), tag="modified")
 
@@ -912,10 +912,10 @@ class RegisterTab:
         row = self.hid0_tree.identify_row(event.y)
         name = self.hid0_tree.item(row, "text")
         val = self.hid0_tree.item(row, "value")
-        if (row in self.spl.groups_unique) | (row == ""):
+        if (row in self.spl.l.groups_unique) | (row == ""):
             return
         if (col == "#5") & (val[4] != ""):
-            messagebox.showinfo(name, self.spl.desc[int(row.split("-")[0])])
+            messagebox.showinfo(name, self.spl.l.desc[int(row.split("-")[0])])
 
     # hid1_tree (address) click event
     def popup_hid1(self, event):
@@ -923,18 +923,18 @@ class RegisterTab:
         row = self.hid1_tree.identify_row(event.y)
         name = self.hid1_tree.item(row, "text")
         val = self.hid1_tree.item(row, "value")
-        if (row in [str(x) for x in self.spl.pages_unique]) | (row == ""):
+        if (row in [str(x) for x in self.spl.l.pages_unique]) | (row == ""):
             return
         if (col == "#3") & (val[2] != ""):
-            messagebox.showinfo(row, self.adr.desc[self.adr.pg_and_num.index(row)])
+            messagebox.showinfo(row, self.adr.l.desc[self.adr.l.pg_and_num.index(row)])
 
     # Treeview etc
     def get_all_children(self):
         for (i, grp) in list(enumerate(self.name_tree.get_children())):
             self.reg.l.all_children.append(grp)
             for iid in list(self.name_tree.get_children(grp)):
-                self.reg.l.all_children.append(self.spl.names_wo_width[int(iid)])
-                self.reg.l.children.append((iid, self.spl.names_wo_width[int(iid)]))
+                self.reg.l.all_children.append(self.spl.l.names_wo_width[int(iid)])
+                self.reg.l.children.append((iid, self.spl.l.names_wo_width[int(iid)]))
 
     def tree_sel(self, event):
         for item in self.name_tree.selection():
@@ -952,7 +952,7 @@ class RegisterTab:
         self.name_tree.selection_clear()
         self.name_tree.yview_moveto(0)
         self.search_entry.delete(0, END)
-        for grp_iid in self.spl.groups_unique:
+        for grp_iid in self.spl.l.groups_unique:
             if grp_iid != "EDID":
                 self.name_tree.item(grp_iid, open=False)
 
@@ -961,12 +961,12 @@ class RegisterTab:
             self.reg.v.curr_row.set(-1)
             self.children_down = self.reg.l.all_children
         for child in self.children_down:
-            if child not in self.spl.groups_unique:
+            if child not in self.spl.l.groups_unique:
                 child_iid = str(self.mer.l.names.index(child))
             else:
                 child_iid = child
             parent_iid = self.name_tree.parent(child_iid)
-            for grp_iid in self.spl.groups_unique:
+            for grp_iid in self.spl.l.groups_unique:
                 if grp_iid != "EDID":
                     self.name_tree.item(grp_iid, open=False)
             if self.reg.v.search.get().lower() in child.lower():
@@ -985,12 +985,12 @@ class RegisterTab:
             self.reg.v.curr_row.set(-1)
             self.children_down = self.reg.l.all_children
         for child in self.children_down:
-            if child not in self.spl.groups_unique:
+            if child not in self.spl.l.groups_unique:
                 child_iid = str(self.mer.l.names.index(child))
             else:
                 child_iid = child
             parent_iid = self.name_tree.parent(child_iid)
-            for grp_iid in self.spl.groups_unique:
+            for grp_iid in self.spl.l.groups_unique:
                 if grp_iid != "EDID":
                     self.name_tree.item(grp_iid, open=False)
             if self.reg.v.search.get().lower() in child.lower():
@@ -1009,12 +1009,12 @@ class RegisterTab:
             self.reg.v.curr_row.set(None)
             self.children_up = list(reversed(self.reg.l.all_children))
         for child in self.children_up:
-            if child not in self.spl.groups_unique:
+            if child not in self.spl.l.groups_unique:
                 child_iid = str(self.mer.l.names.index(child))
             else:
                 child_iid = child
             parent_iid = self.name_tree.parent(child_iid)
-            for grp_iid in self.spl.groups_unique:
+            for grp_iid in self.spl.l.groups_unique:
                 if grp_iid != "EDID":
                     self.name_tree.item(grp_iid, open=False)
             if self.reg.v.search.get().lower() in child.lower():
@@ -1033,12 +1033,12 @@ class RegisterTab:
             self.reg.v.curr_row.set(None)
             self.children_up = list(reversed(self.reg.l.all_children))
         for child in self.children_up:
-            if child not in self.spl.groups_unique:
+            if child not in self.spl.l.groups_unique:
                 child_iid = str(self.mer.l.names.index(child))
             else:
                 child_iid = child
             parent_iid = self.name_tree.parent(child_iid)
-            for grp_iid in self.spl.groups_unique:
+            for grp_iid in self.spl.l.groups_unique:
                 if grp_iid != "EDID":
                     self.name_tree.item(grp_iid, open=False)
             if self.reg.v.search.get().lower() in child.lower():
@@ -1057,13 +1057,13 @@ class RegisterTab:
             item_text = self.name_tree.item(item, "text")
             break
 
-        if item_text in self.spl.groups_unique:
-            fraction = self.spl.groups_unique.index(item_text) / len(self.spl.groups_unique)
-        elif item_text not in self.spl.groups_unique:
+        if item_text in self.spl.l.groups_unique:
+            fraction = self.spl.l.groups_unique.index(item_text) / len(self.spl.l.groups_unique)
+        elif item_text not in self.spl.l.groups_unique:
             child_iid = str(self.mer.l.names.index(item_text))
             parent_iid = self.name_tree.parent(child_iid)
-            numerator = self.spl.groups_unique.index(parent_iid) + list(self.name_tree.get_children(parent_iid)).index(child_iid) + 1
-            denominator = len(self.spl.groups_unique) + len(list(self.name_tree.get_children(parent_iid)))
+            numerator = self.spl.l.groups_unique.index(parent_iid) + list(self.name_tree.get_children(parent_iid)).index(child_iid) + 1
+            denominator = len(self.spl.l.groups_unique) + len(list(self.name_tree.get_children(parent_iid)))
             fraction = numerator / denominator
 
         self.name_tree.yview_moveto(fraction)
@@ -1075,46 +1075,46 @@ class RegisterTab:
 
     def reset_reg(self):
         for (i, item) in list(enumerate(self.mer.l.names)):
-            if (item != "MERGED") & (i < self.spl.groups.index("EDID")):
-                self.name_tree.set(str(i), column="#2", value=self.mer.bina[i])
-                self.name_tree.set(str(i), column="#3", value=self.mer.deci[i])
-                self.name_tree.set(str(i), column="#4", value=self.mer.hexa[i])
+            if (item != "MERGED") & (i < self.spl.l.groups.index("EDID")):
+                self.name_tree.set(str(i), column="#2", value=self.mer.l.bina[i])
+                self.name_tree.set(str(i), column="#3", value=self.mer.l.deci[i])
+                self.name_tree.set(str(i), column="#4", value=self.mer.l.hexa[i])
 
-        for j in range(len(self.spl.names_w_width)):
-            if j < self.spl.groups.index("EDID"):
-                self.hid0_tree.set(str(j) + "-split", column="#2", value=self.spl.bina[j])
-                self.hid0_tree.set(str(j) + "-split", column="#3", value=self.spl.deci[j])
-                self.hid0_tree.set(str(j) + "-split", column="#4", value=self.spl.hexa[j])
+        for j in range(len(self.spl.l.names_w_width)):
+            if j < self.spl.l.groups.index("EDID"):
+                self.hid0_tree.set(str(j) + "-split", column="#2", value=self.spl.l.bina[j])
+                self.hid0_tree.set(str(j) + "-split", column="#3", value=self.spl.l.deci[j])
+                self.hid0_tree.set(str(j) + "-split", column="#4", value=self.spl.l.hexa[j])
 
-        for (k, item) in list(enumerate(self.adr.pg_and_num)):
+        for (k, item) in list(enumerate(self.adr.l.pg_and_num)):
             if item.split("-")[0] != "237":
-                self.hid1_tree.set(item, column="#1", value=self.adr.bina[k])
-                self.hid1_tree.set(item, column="#2", value=self.adr.hexa[k])
+                self.hid1_tree.set(item, column="#1", value=self.adr.l.bina[k])
+                self.hid1_tree.set(item, column="#2", value=self.adr.l.hexa[k])
 
-        for (x, pg) in list(enumerate(self.spl.pages_unique)):
+        for (x, pg) in list(enumerate(self.spl.l.pages_unique)):
             if pg == 237:
                 continue
             hex_val_list = []
-            for (y, item) in list(enumerate(self.adr.num_range[x])):
+            for (y, item) in list(enumerate(self.adr.l.num_range[x])):
                 hex_val = []
                 for z in range(16):
-                    hex_val.append(self.adr.hexa_per_pg[x][y * 16 + z])
+                    hex_val.append(self.adr.l.hexa_per_pg[x][y * 16 + z])
                 for w in (4, 9, 14):
                     hex_val.insert(w, "\u250a")
                 hex_val_list.append(hex_val)
-            for (y, item) in list(enumerate(self.adr.num_range[x])):
+            for (y, item) in list(enumerate(self.adr.l.num_range[x])):
                 for col in range(19):
                     self.addr_tree.set(str(pg) + " " + item, column="#" + str(col + 1), value=hex_val_list[y][col])
 
-        self.mer.bina_mod[:self.spl.pages.index(237)] = self.mer.bina[:self.spl.pages.index(237)]
-        self.mer.deci_mod[:self.spl.pages.index(237)] = self.mer.deci[:self.spl.pages.index(237)]
-        self.mer.hexa_mod[:self.spl.pages.index(237)] = self.mer.hexa[:self.spl.pages.index(237)]
-        self.spl.bina_mod[:self.spl.pages.index(237)] = self.spl.bina[:self.spl.pages.index(237)]
-        self.spl.deci_mod[:self.spl.pages.index(237)] = self.spl.deci[:self.spl.pages.index(237)]
-        self.spl.hexa_mod[:self.spl.pages.index(237)] = self.spl.hexa[:self.spl.pages.index(237)]
-        self.adr.bina_mod[:self.spl.pages.index(237)] = self.adr.bina[:self.spl.pages.index(237)]
-        self.adr.hexa_mod[:self.spl.pages.index(237)] = self.adr.hexa[:self.spl.pages.index(237)]
-        self.adr.hexa_per_pg_mod[:self.spl.pages_unique.index(237)] = deepcopy(self.adr.hexa_per_pg[:self.spl.pages_unique.index(237)])
+        self.mer.l.bina_mod[:self.spl.l.pages.index(237)] = self.mer.l.bina[:self.spl.l.pages.index(237)]
+        self.mer.l.deci_mod[:self.spl.l.pages.index(237)] = self.mer.l.deci[:self.spl.l.pages.index(237)]
+        self.mer.l.hexa_mod[:self.spl.l.pages.index(237)] = self.mer.l.hexa[:self.spl.l.pages.index(237)]
+        self.spl.l.bina_mod[:self.spl.l.pages.index(237)] = self.spl.l.bina[:self.spl.l.pages.index(237)]
+        self.spl.l.deci_mod[:self.spl.l.pages.index(237)] = self.spl.l.deci[:self.spl.l.pages.index(237)]
+        self.spl.l.hexa_mod[:self.spl.l.pages.index(237)] = self.spl.l.hexa[:self.spl.l.pages.index(237)]
+        self.adr.l.bina_mod[:self.spl.l.pages.index(237)] = self.adr.l.bina[:self.spl.l.pages.index(237)]
+        self.adr.l.hexa_mod[:self.spl.l.pages.index(237)] = self.adr.l.hexa[:self.spl.l.pages.index(237)]
+        self.adr.l.hexa_per_pg_mod[:self.spl.l.pages_unique.index(237)] = deepcopy(self.adr.l.hexa_per_pg[:self.spl.l.pages_unique.index(237)])
         self.reg.l.modified_pg = list(set(self.reg.l.modified_pg) - (set(self.reg.l.modified_pg) - {"237"}))
         self.eep.l.mod_by_eep_pg = list(set(self.eep.l.mod_by_eep_pg) - (set(self.eep.l.mod_by_eep_pg) - {"237"}))
 
@@ -1134,6 +1134,7 @@ class RegisterTab:
             self.reg.v.xlsx_names.set("\n".join(self.reg.l.xlsx_list))
 
         self.bin_over_20b()
+        self.p.check_mod()
 
     def show_hide(self, choice):
         if choice.lower() == "name":

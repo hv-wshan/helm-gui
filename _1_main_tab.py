@@ -7,15 +7,16 @@ from math import ceil, log2
 class MainTab:
     def __init__(self, parent):
         self.p = parent
+        self.gui = self.p.gui
         self.main = self.p.main
         self.spl = self.p.spl
 
         main_note = ttk.Notebook(self.p.main_frm)
         main_note.pack(fill=BOTH, expand=YES)
 
-        disp_frm = ttk.Frame(main_note, padding=50)
-        freq_frm = ttk.Frame(main_note, padding=50)
-        ltps_frm = ttk.Frame(main_note, padding=20)
+        disp_frm = ttk.Frame(main_note, padding=self.gui.v.pad.get() * 5)
+        freq_frm = ttk.Frame(main_note, padding=self.gui.v.pad.get() * 5)
+        ltps_frm = ttk.Frame(main_note, padding=self.gui.v.pad.get() * 5)
         main_note.add(disp_frm, text=" Display ")
         main_note.add(freq_frm, text=" Frequncy ")
         main_note.add(ltps_frm, text=" LTPS ")
@@ -57,6 +58,11 @@ class MainTab:
         ttk.Button(disp1, text="Load Register Data", width=20, command=self.disp_load_reg).pack(side=TOP, pady=(15, 0), ipady=3)
         ttk.Button(disp1, text="Load IC Data", width=20, command=self.disp_load_ic, state=DISABLED).pack(side=TOP, pady=(15, 0), ipady=3)
         ttk.Button(disp1, text="Set Data", width=20, command=self.disp_set).pack(side=TOP, pady=(15, 0), ipady=3)
+
+        self.main.v.hb_fp.trace0 = self.main.v.hb_fp.trace("w", lambda name, index, mode, type="H": self.calc_blank(type))
+        self.main.v.hb_bp.trace1 = self.main.v.hb_bp.trace("w", lambda name, index, mode, type="H": self.calc_blank(type))
+        self.main.v.vb_fp.trace2 = self.main.v.vb_fp.trace("w", lambda name, index, mode, type="V": self.calc_blank(type))
+        self.main.v.vb_bp.trace3 = self.main.v.vb_bp.trace("w", lambda name, index, mode, type="V": self.calc_blank(type))
 
         freq0 = ttk.Frame(freq_frm)
         freq1 = ttk.Frame(freq_frm)
@@ -114,13 +120,42 @@ class MainTab:
         Spinbox(freq0, values=(1, 2, 4, 8), textvariable=self.main.v.div[12], width=6, command=lambda num=5: self.calc_freq(num)).grid(row=8, column=9, pady=(5, 0), sticky=NW)
         Spinbox(freq0, values=(1, 2, 4, 8), textvariable=self.main.v.div[13], width=6, command=lambda num=6: self.calc_freq(num)).grid(row=9, column=9, pady=(5, 0), sticky=NW)
 
+        [self.main.v.mlt[x].set("") for x in range(3)]
+        [self.main.v.div[x].set("") for x in range(14)]
+
+    # Display Tab
+    def calc_blank(self, type):
+        if type.upper() == "H":
+            fp = self.main.v.hb_fp.get()
+            bp = self.main.v.hb_bp.get()
+            blank = self.main.v.hblank
+        elif type.upper() == "V":
+            fp = self.main.v.vb_fp.get()
+            bp = self.main.v.vb_bp.get()
+            blank = self.main.v.vblank
+        else:
+            raise ValueError("Invalid argument value in calc_blank(): 'type'")
+
+        if (fp == "") | (bp == ""):
+            blank.set("")
+        else:
+            try:
+                blank.set(int(fp) + int(bp))
+            except ValueError:
+                blank.set("")
+
     def disp_load_reg(self):
-        if len(self.spl.names_wo_width) == 0:
+        if len(self.spl.l.names_wo_width) == 0:
             messagebox.showerror("ERROR", "Must Import Excel")
             return
         if "TCON" not in self.spl.l.groups_unique:
             messagebox.showwarning("WARNING", "Must Add Excel")
             return
+
+        self.main.v.hb_fp.trace_vdelete("w", self.main.v.hb_fp.trace0)
+        self.main.v.hb_bp.trace_vdelete("w", self.main.v.hb_bp.trace1)
+        self.main.v.vb_fp.trace_vdelete("w", self.main.v.vb_fp.trace2)
+        self.main.v.vb_bp.trace_vdelete("w", self.main.v.vb_bp.trace3)
 
         hres = self.p.get_val_by_name("HRES", "#3")
         hb = self.p.get_val_by_name("HB", "#3")
@@ -159,11 +194,16 @@ class MainTab:
             self.main.v.dic_lane[dic_start + ic].set(f"{px_start:4d}px ~ {px_end:4d}px")
             px_start = px_end + 1
 
+        self.main.v.hb_fp.trace0 = self.main.v.hb_fp.trace("w", lambda name, index, mode, type="H": self.calc_blank(type))
+        self.main.v.hb_bp.trace1 = self.main.v.hb_bp.trace("w", lambda name, index, mode, type="H": self.calc_blank(type))
+        self.main.v.vb_fp.trace2 = self.main.v.vb_fp.trace("w", lambda name, index, mode, type="V": self.calc_blank(type))
+        self.main.v.vb_bp.trace3 = self.main.v.vb_bp.trace("w", lambda name, index, mode, type="V": self.calc_blank(type))
+
     def disp_load_ic(self):
         return
 
     def disp_set(self):
-        if len(self.spl.names_wo_width) == 0:
+        if len(self.spl.l.names_wo_width) == 0:
             messagebox.showerror("ERROR", "Must Import Excel")
             return
         if "TCON" not in self.spl.l.groups_unique:
@@ -225,8 +265,9 @@ class MainTab:
 
         messagebox.showinfo("Set Data to Register Files", "Complete")
 
+    # Frequency Tab
     def freq_load_reg(self):
-        if len(self.spl.names_wo_width) == 0:
+        if len(self.spl.l.names_wo_width) == 0:
             messagebox.showerror("ERROR", "Must Import Excel")
             return
         if "mithril" not in self.spl.l.groups_unique:
@@ -280,7 +321,7 @@ class MainTab:
         return
 
     def freq_set(self):
-        if len(self.spl.names_wo_width) == 0:
+        if len(self.spl.l.names_wo_width) == 0:
             messagebox.showerror("ERROR", "Must Import Excel")
             return
         if "mithril" not in self.spl.l.groups_unique:

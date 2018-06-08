@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-from tkinter import filedialog#, messagebox, simpledialog
+from tkinter import filedialog
 from tkinter.scrolledtext import ScrolledText as tkst
 from openpyxl import load_workbook
 import re
@@ -22,9 +22,6 @@ class FileCheck(Toplevel):
         top = ttk.Frame(frm)
         mid = ttk.Frame(frm)
         bot = ttk.Frame(frm)
-        #top.place(relx=0, rely=0, relwidth=1, relheight=0.65)
-        #mid.place(relx=0, rely=0.65, relwidth=1, relheight=0.27)
-        #bot.place(relx=0, rely=0.92, relwidth=1, relheight=0.08)
         top.place(relx=0, rely=0, relwidth=1, relheight=0.57)
         mid.place(relx=0, rely=0.57, relwidth=1, relheight=0.27)
         bot.place(relx=0, rely=0.84, relwidth=1, relheight=0.16)

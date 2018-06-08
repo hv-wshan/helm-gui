@@ -28,7 +28,7 @@ class HivicsGui:
         self.mer = MergedRegData()
         self.adr = AddressRegData()
 
-        self.root.title("HivICs Helm controller GUI rev0.170726")
+        self.root.title("HivICs Helm controller GUI " + self.gui.v.version.get())
         self.root.tk.call("wm", "iconphoto", self.root._w, PhotoImage(data=self.gui.logo))
         self.detect_screen()
 
@@ -84,9 +84,11 @@ class HivicsGui:
 
         if (w < 1050) | (h < 950):
             self.root.geometry("720x650")
-            self.root.tk.call('tk', 'scaling', 0.6)
+            self.root.tk.call('tk', 'scaling', 1)
+            self.gui.v.pad.set(0)
         else:
             self.root.geometry("1050x950")
+            self.gui.v.pad.set(10)
 
     # Button Functions
     def tf_check(self, type):
@@ -115,8 +117,8 @@ class HivicsGui:
         else:
             if not self.gui.v.logfilename.get().lower().endswith(".log"):
                 self.gui.v.logfilename.set(self.gui.v.logfilename.get() + ".log")
-            #self.gui.v.log_bool.set(True)
-            #self.gui.v.log_check.set(1)
+            self.gui.v.log_bool.set(True)
+            self.gui.v.log_check.set(1)
             logfile = open(self.gui.v.logfilename.get(), "w")
             logfile.write("")
             logfile.close()
@@ -165,10 +167,12 @@ class HivicsGui:
         self.adr.l.bina = self.adr.l.bina_default.copy()
         self.adr.l.hexa = self.adr.l.hexa_default.copy()
         self.adr.l.hexa_per_pg = deepcopy(self.adr.l.hexa_per_pg_default)
-        
-        self.reg_tab.reset_reg()
+
+        if len(self.reg_tab.name_tree.get_children()) != 0:
+            self.reg_tab.reset_reg()
+        if len(self.eep_tab.ed_name_tree.get_children()) != 0:
+            self.eep_tab.reset_ed()
         self.eep_tab.reset_eep()
-        self.eep_tab.reset_ed()
 
         self.reg_tab.name_tree.selection_clear()
         self.reg_tab.addr_tree.selection_clear()
@@ -184,6 +188,10 @@ class HivicsGui:
         self.reg.v.check1.set(0)
         self.reg_tab.reg_note.hide(self.reg_tab.hid0_frm)
         self.reg_tab.reg_note.hide(self.reg_tab.hid1_frm)
+        self.eep.v.ed_check0.set(0)
+        self.eep.v.ed_check1.set(0)
+        self.eep_tab.edid_note.hide(self.eep_tab.ed_hid0)
+        self.eep_tab.edid_note.hide(self.eep_tab.ed_hid1)
 
         for grp_iid in self.reg_tab.spl.groups_unique:
             if grp_iid != "EDID":
@@ -198,14 +206,91 @@ class HivicsGui:
                 self.reg_tab.addr_tree.selection_remove(pg_iid)
                 self.reg_tab.hid1_tree.selection_remove(pg_iid)
 
+        self.tst_tab.regfile_summary_lists()
+        self.tst_tab.summ_add_treeview()
         if "GPIO" in self.spl.l.groups_unique:
             self.tst_tab.test_gpio_tab.gpio_load()
             self.tst_tab.test_gpio_tab.set_defaults()
         if "EDID" in self.spl.l.groups_unique:
             self.eep_tab.ed_add_treeview()
-            self.eep_tab.load_data()
+            self.eep_tab.ed_load()
             self.eep_tab.set_defaults()
-        # set all variables to default
+
+        for slave in self.eep_tab.idx_frm.grid_slaves():
+            slave.destroy()
+        for slave in self.eep_tab.file_frm.grid_slaves():
+            slave.destroy()
+
+        self.gui.v.logfilename.set("")
+        self.gui.v.log_bool.set(False)
+        self.gui.v.i2c_bool.set(False)
+        self.gui.v.reg_bool.set(False)
+        self.gui.v.log_check.set(0)
+        self.gui.v.i2c_check.set(0)
+        self.gui.v.reg_check.set(0)
+        self.main.v.hres.set("")
+        self.main.v.hblank.set("")
+        self.main.v.hb_fp.set("")
+        self.main.v.hb_bp.set("")
+        self.main.v.vres.set("")
+        self.main.v.vblank.set("")
+        self.main.v.vb_fp.set("")
+        self.main.v.vb_bp.set("")
+        self.main.v.dic_no.set("4")
+        self.main.v.dic_ch.set("960")
+        self.main.v.dic_ofs.set("")
+        [self.main.v.dic_lane[x].set("") for x in range(6)]
+        [self.main.v.freq[x].set("") for x in range(7)]
+        [self.main.v.mlt[x].set("") for x in range(3)]
+        [self.main.v.div[x].set("") for x in range(14)]
+        self.reg.v.search.set("")
+        self.reg.v.curr_row.set("")
+        self.i2c.v.slave_addr.set("54")
+        self.i2c.v.access_addr.set("80 00")
+        self.i2c.v.write.set("00")
+        self.i2c.v.read_num.set("1")
+        self.eep.v.slave_addr.set("51")
+        self.eep.v.access_addr.set("00 00")
+        self.eep.v.write.set("")
+        self.eep.v.read_num.set("1")
+        self.eep.v.pg_id.set("")
+        self.eep.v.pg_len.set("")
+        self.eep.v.crc_read.set("")
+        self.eep.v.crc_sum.set("")
+        self.eep.v.crc_ofs.set("FE")
+        self.eep.v.next_pg.set("")
+        self.eep.v.write_1.set("")
+        self.eep.v.write_list.set("")
+        self.eep.v.check_mod.set("")
+        self.eep.v.pri_main.set("4A")
+        self.eep.v.pri_core.set("ED 49 96 80 95")
+        self.eep.v.pri_base.set("40 41 42 84 82 98 99 9A")
+        self.eep.v.import_rom.set("")
+        self.eep.v.conc.set("")
+        self.eep.v.txt_main.set("")
+        self.eep.v.txt_core.set("")
+        self.eep.v.txt_base.set("")
+        [self.eep.v.txtfile[x].set("") for x in range(2)]
+        self.eep.v.sub20_pages.set("")
+        self.eep.v.sub20_pg_num.set("")
+        self.eep.v.sub20_total_len.set("")
+        self.eep.v.check.set(0)
+        self.eep.d.eep_imp_pg = {}
+        self.eep.l.imported_txt = []
+        self.eep.l.mod_by_eep_pg = []
+        [self.tst.v.psm_var[x][y].set("") for x in range(5) for y in range(3)]
+        self.tst.v.psm_var[5].set("")
+        [self.tst.v.pss_var[x].set("") for x in range(5)]
+        self.fls.v.flash_addr.set("")
+        self.fls.v.w_24.set("")
+        self.fls.v.r_24.set("")
+        self.fls.v.flash_from.set("")
+        self.fls.v.flash_to.set("")
+
+        self.tkst_write(self.i2c_tab.tkst_read, delete=True)
+        self.tkst_write(self.i2c_tab.tkst_read, text="-")
+
+        messagebox.showinfo("RESET", "Complete")
 
     def launch(self):
         launch = FileCheck()
@@ -213,15 +298,26 @@ class HivicsGui:
     # Globally Used Functions
     def get_val_by_name(self, name, col):
         iid = str(self.mer.l.names.index(name))
-        return self.reg_tab.name_tree.set(iid, column=col)
+        if self.reg_tab.name_tree.exists(iid):
+            return self.reg_tab.name_tree.set(iid, column=col)
+        elif self.eep_tab.ed_name_tree.exists(iid):
+            return self.eep_tab.ed_name_tree.set(iid, column=col)
+        else:
+            raise ValueError("Register Name Does Not Exist")
 
     def set_val_by_name(self, name, col, new, tag="modified"):
         row = str(self.mer.l.names.index(name))
-        val = self.reg_tab.name_tree.item(row, "value")
-        self.reg_tab.modify0(col, row, name, val, new, mod_tag=tag)
+        if self.reg_tab.name_tree.exists(row):
+            val = self.reg_tab.name_tree.item(row, "value")
+            self.reg_tab.modify0(col, row, name, val, new, mod_tag=tag)
+        elif self.eep_tab.ed_name_tree.exists(row):
+            val = self.eep_tab.ed_name_tree.item(row, "value")
+            self.eep_tab.ed_modify0(col, row, name, val, new, mod_tag=tag)
+        else:
+            raise ValueError("Register Address Does Not Exist")
 
     def check_mod(self):
-        self.eep.v.eep_check_mod.set(" ".join([f"{int(pg):02x}".upper() for pg in sorted(self.reg.l.modified_pg, key=int)]))
+        self.eep.v.check_mod.set(" ".join([f"{int(pg):02x}".upper() for pg in sorted(self.reg.l.modified_pg, key=int)]))
 
     def imp_reg(self):
         try:
