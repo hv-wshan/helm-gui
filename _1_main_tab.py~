@@ -12,7 +12,6 @@ class MainTab:
         self.spl = self.p.spl
 
 		# ws test
-		# second modification
 
         main_note = ttk.Notebook(self.p.main_frm)
         main_note.pack(fill=BOTH, expand=YES)
